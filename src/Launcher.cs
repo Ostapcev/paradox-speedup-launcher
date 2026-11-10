@@ -25,7 +25,11 @@ using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 
 [assembly: AssemblyTitle("Ускорение игр Paradox — установщик")]
-[assembly: AssemblyVersion("2.0.0.0")]
+[assembly: AssemblyProduct("Ускорение игр Paradox")]
+[assembly: AssemblyCompany("Ostapcev")]
+[assembly: AssemblyCopyright("MIT, github.com/Ostapcev/paradox-speedup-launcher")]
+[assembly: AssemblyVersion("2.0.1.0")]
+[assembly: AssemblyFileVersion("2.0.1.0")]
 
 namespace SpeedLauncher
 {
@@ -34,7 +38,7 @@ namespace SpeedLauncher
         // Where the launcher looks for catalog.json (the other files are next to it).
         // Plugin releases live in the paradox-speedup repository (catalog.json, <game>_manifest.json, <game>_plugins.zip).
         public const string DefaultSource = "https://github.com/Ostapcev/paradox-speedup/releases/latest/download/catalog.json";
-        public const string AppVersion = "2.0";
+        public const string AppVersion = "2.0.1";
         public const string StateFile = "speedup_launcher_state.txt";
         public const string BackupDir = "speedup_launcher_backup";
     }
@@ -1328,6 +1332,8 @@ namespace SpeedLauncher
             Window window;
             using (var s = Assembly.GetExecutingAssembly().GetManifestResourceStream("MainWindow.xaml"))
                 window = (Window)XamlReader.Load(s);
+            using (var s = Assembly.GetExecutingAssembly().GetManifestResourceStream("app.ico"))
+                if (s != null) window.Icon = BitmapFrame.Create(s, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
             new Launcher(window, source, gameId, dir);
             app.Run(window);
         }

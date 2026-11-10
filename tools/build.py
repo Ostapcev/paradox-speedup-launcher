@@ -19,6 +19,8 @@ def main() -> None:
            '/r:System.Windows.Forms.dll', '/r:System.Xaml.dll',
            '/r:' + WPF + 'PresentationFramework.dll', '/r:' + WPF + 'PresentationCore.dll', '/r:' + WPF + 'WindowsBase.dll',
            '/resource:' + os.path.join(HERE, 'src', 'MainWindow.xaml') + ',MainWindow.xaml',
+           '/win32icon:' + os.path.join(HERE, 'src', 'app.ico'),
+           '/resource:' + os.path.join(HERE, 'src', 'app.ico') + ',app.ico',
            os.path.join(HERE, 'src', 'Launcher.cs')]
     manifest = os.path.join(HERE, 'src', 'app.manifest')
     if os.path.isfile(manifest):
