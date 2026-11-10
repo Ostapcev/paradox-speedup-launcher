@@ -1,0 +1,4 @@
+# build output and release assets (published as GitHub release files, not in git)
+/release/
+__pycache__/
+*.png.tmp

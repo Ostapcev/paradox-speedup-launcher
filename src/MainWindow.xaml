@@ -1,0 +1,397 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Ускорение игр Paradox" Width="1280" Height="840" MinWidth="1080" MinHeight="680"
+        WindowStartupLocation="CenterScreen" Background="#F4F5F8"
+        FontFamily="Segoe UI" FontSize="13" Foreground="#1D2433" UseLayoutRounding="True" SnapsToDevicePixels="True">
+  <Window.Resources>
+    <SolidColorBrush x:Key="Accent" Color="#2563EB"/>
+    <SolidColorBrush x:Key="Line" Color="#E3E6EC"/>
+    <SolidColorBrush x:Key="Muted" Color="#667085"/>
+
+    <Style x:Key="Card" TargetType="Border">
+      <Setter Property="Background" Value="White"/>
+      <Setter Property="BorderBrush" Value="{StaticResource Line}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="12"/>
+    </Style>
+
+    <Style x:Key="Btn" TargetType="Button">
+      <Setter Property="Foreground" Value="#1D2433"/>
+      <Setter Property="Background" Value="White"/>
+      <Setter Property="BorderBrush" Value="#D0D5DD"/>
+      <Setter Property="Padding" Value="16,8"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Margin" Value="8,0,0,0"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="b" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="1" CornerRadius="8" Padding="{TemplateBinding Padding}">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="b" Property="Background" Value="#F2F4F7"/></Trigger>
+              <Trigger Property="IsPressed" Value="True"><Setter TargetName="b" Property="Background" Value="#E4E7EC"/></Trigger>
+              <Trigger Property="IsEnabled" Value="False"><Setter TargetName="b" Property="Opacity" Value="0.45"/></Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style x:Key="PrimaryBtn" TargetType="Button" BasedOn="{StaticResource Btn}">
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="Padding" Value="22,9"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="b" Background="#2563EB" CornerRadius="8" Padding="{TemplateBinding Padding}">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="b" Property="Background" Value="#1D4ED8"/></Trigger>
+              <Trigger Property="IsPressed" Value="True"><Setter TargetName="b" Property="Background" Value="#1E40AF"/></Trigger>
+              <Trigger Property="IsEnabled" Value="False"><Setter TargetName="b" Property="Background" Value="#A9BEEA"/></Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style x:Key="LinkBtn" TargetType="Button">
+      <Setter Property="Foreground" Value="#2563EB"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Margin" Value="12,0,0,0"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <TextBlock x:Name="t" Text="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}"/>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="t" Property="TextDecorations" Value="Underline"/></Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style x:Key="Switch" TargetType="CheckBox">
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Focusable" Value="False"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="CheckBox">
+            <Grid Width="40" Height="22" Background="Transparent">
+              <Border x:Name="track" CornerRadius="11" Background="#D0D5DD"/>
+              <Ellipse x:Name="knob" Width="16" Height="16" Fill="White" HorizontalAlignment="Left" Margin="3,0,0,0"/>
+            </Grid>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="track" Property="Background" Value="#2563EB"/>
+                <Setter TargetName="knob" Property="HorizontalAlignment" Value="Right"/>
+                <Setter TargetName="knob" Property="Margin" Value="0,0,3,0"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False"><Setter TargetName="track" Property="Opacity" Value="0.45"/></Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style x:Key="ModeCard" TargetType="RadioButton">
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Margin" Value="0,0,12,0"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="RadioButton">
+            <Border x:Name="b" Background="White" BorderBrush="#E3E6EC" BorderThickness="1.5" CornerRadius="12" Padding="16,12">
+              <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                <Grid Width="18" Height="18" VerticalAlignment="Top" Margin="0,1,12,0">
+                  <Ellipse x:Name="ring" Stroke="#B0B8C6" StrokeThickness="1.5"/>
+                  <Ellipse x:Name="dot" Width="8" Height="8" Fill="#2563EB" Visibility="Collapsed"/>
+                </Grid>
+                <ContentPresenter Grid.Column="1"/>
+              </Grid>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="b" Property="BorderBrush" Value="#B6C3DA"/></Trigger>
+              <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="b" Property="BorderBrush" Value="#2563EB"/>
+                <Setter TargetName="b" Property="Background" Value="#F2F6FF"/>
+                <Setter TargetName="ring" Property="Stroke" Value="#2563EB"/>
+                <Setter TargetName="dot" Property="Visibility" Value="Visible"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False"><Setter TargetName="b" Property="Opacity" Value="0.5"/></Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style x:Key="Chip" TargetType="Border">
+      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="Padding" Value="9,2"/>
+      <Setter Property="Margin" Value="0,0,8,0"/>
+    </Style>
+
+    <!-- sidebar game list -->
+    <Style x:Key="GameItem" TargetType="ListBoxItem">
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ListBoxItem">
+            <Border x:Name="b" Background="Transparent" CornerRadius="10" Padding="10,9" Margin="10,2">
+              <ContentPresenter/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="b" Property="Background" Value="#202838"/></Trigger>
+              <Trigger Property="IsSelected" Value="True"><Setter TargetName="b" Property="Background" Value="#2A3448"/></Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <!-- plugin list -->
+    <Style x:Key="PluginItem" TargetType="ListBoxItem">
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ListBoxItem">
+            <Border x:Name="b" Background="Transparent" BorderBrush="Transparent" BorderThickness="1" CornerRadius="10" Padding="12,9" Margin="6,2">
+              <ContentPresenter/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="b" Property="Background" Value="#F6F7F9"/></Trigger>
+              <Trigger Property="IsSelected" Value="True">
+                <Setter TargetName="b" Property="Background" Value="#F2F6FF"/>
+                <Setter TargetName="b" Property="BorderBrush" Value="#C7D7FB"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style TargetType="ComboBox">
+      <Setter Property="Height" Value="32"/>
+      <Setter Property="Padding" Value="8,5"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+  </Window.Resources>
+
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="250"/>
+      <ColumnDefinition Width="*"/>
+    </Grid.ColumnDefinitions>
+
+    <!-- ===================== sidebar ===================== -->
+    <Border Background="#171C26">
+      <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Margin="22,26,22,22">
+          <StackPanel Orientation="Horizontal">
+            <Border Width="30" Height="30" CornerRadius="8" Background="#D4A73A">
+              <TextBlock Text="&#xE945;" FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="#171C26"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock Text="Ускорение" FontSize="19" FontWeight="SemiBold" Foreground="White" Margin="10,0,0,0" VerticalAlignment="Center"/>
+          </StackPanel>
+          <TextBlock Text="плагины для игр Paradox" Foreground="#8C95A6" Margin="40,2,0,0"/>
+        </StackPanel>
+        <TextBlock DockPanel.Dock="Top" Text="ИГРЫ" Foreground="#6B7486" FontSize="11" FontWeight="SemiBold" Margin="24,4,0,6"/>
+        <TextBlock x:Name="appVersion" DockPanel.Dock="Bottom" Foreground="#596274" FontSize="11" Margin="24,0,0,18"/>
+        <ListBox x:Name="gameList" Background="Transparent" BorderThickness="0" ItemContainerStyle="{StaticResource GameItem}"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <Grid Opacity="{Binding Opacity}">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                <Border Width="38" Height="38" CornerRadius="9" Background="{Binding LogoBrush}">
+                  <TextBlock Text="{Binding Short}" Foreground="White" FontWeight="Bold" FontSize="12"
+                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <StackPanel Grid.Column="1" Margin="11,0,0,0" VerticalAlignment="Center">
+                  <TextBlock Text="{Binding Name}" Foreground="#E8EBF0" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                  <TextBlock Text="{Binding Status}" Foreground="{Binding StatusBrush}" FontSize="11.5" Margin="0,1,0,0" TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </DockPanel>
+    </Border>
+
+    <!-- ===================== main ===================== -->
+    <Grid Grid.Column="1">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+
+      <!-- header -->
+      <Grid Margin="32,26,32,0">
+        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+        <Border x:Name="headLogo" Width="58" Height="58" CornerRadius="14" Background="#B8860B" VerticalAlignment="Top">
+          <TextBlock x:Name="headShort" Foreground="White" FontWeight="Bold" FontSize="17"
+                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Border>
+        <StackPanel Grid.Column="1" Margin="18,0,0,0">
+          <TextBlock x:Name="headName" FontSize="24" FontWeight="SemiBold"/>
+          <WrapPanel Margin="0,6,0,0">
+            <Border x:Name="chipVersion" Style="{StaticResource Chip}" Background="#EEF0F4">
+              <TextBlock x:Name="chipVersionText" FontSize="12" FontWeight="SemiBold" Foreground="#556070"/>
+            </Border>
+            <Border x:Name="chipInstalled" Style="{StaticResource Chip}" Background="#EEF0F4">
+              <TextBlock x:Name="chipInstalledText" FontSize="12" FontWeight="SemiBold" Foreground="#556070"/>
+            </Border>
+          </WrapPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+            <TextBlock Text="&#xE838;" FontFamily="Segoe MDL2 Assets" Foreground="#98A2B3" VerticalAlignment="Center" Margin="0,1,7,0"/>
+            <TextBlock x:Name="gameDirText" Foreground="#667085" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="560"/>
+            <Button x:Name="changeDirButton" Style="{StaticResource LinkBtn}" Content="Изменить…" VerticalAlignment="Center"/>
+            <Button x:Name="openDirButton" Style="{StaticResource LinkBtn}" Content="Открыть папку" VerticalAlignment="Center"/>
+          </StackPanel>
+        </StackPanel>
+      </Grid>
+
+      <!-- body -->
+      <Grid Grid.Row="1" Margin="32,22,32,0">
+        <Grid x:Name="content">
+          <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+
+          <UniformGrid Rows="1" Margin="0,0,-12,0">
+            <RadioButton x:Name="modeAll" Style="{StaticResource ModeCard}" GroupName="mode">
+              <StackPanel>
+                <TextBlock Text="Все плагины" FontWeight="SemiBold" FontSize="14"/>
+                <TextBlock Text="Максимальная скорость. Партия может идти немного иначе, чем в обычной игре."
+                           TextWrapping="Wrap" Foreground="#667085" Margin="0,3,0,0"/>
+              </StackPanel>
+            </RadioButton>
+            <RadioButton x:Name="modeExact" Style="{StaticResource ModeCard}" GroupName="mode">
+              <StackPanel>
+                <TextBlock Text="Только точные" FontWeight="SemiBold" FontSize="14"/>
+                <TextBlock Text="Расчёты игры такие же, как без плагинов. Ускорение чуть меньше."
+                           TextWrapping="Wrap" Foreground="#667085" Margin="0,3,0,0"/>
+              </StackPanel>
+            </RadioButton>
+            <RadioButton x:Name="modeCustom" Style="{StaticResource ModeCard}" GroupName="mode">
+              <StackPanel>
+                <TextBlock Text="Выборочно" FontWeight="SemiBold" FontSize="14"/>
+                <TextBlock Text="Включить нужные плагины и поменять их настройки самому."
+                           TextWrapping="Wrap" Foreground="#667085" Margin="0,3,0,0"/>
+              </StackPanel>
+            </RadioButton>
+          </UniformGrid>
+
+          <Grid Grid.Row="1" Margin="0,16,0,0">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="11*"/><ColumnDefinition Width="16"/><ColumnDefinition Width="10*"/></Grid.ColumnDefinitions>
+
+            <Border Style="{StaticResource Card}">
+              <DockPanel>
+                <Grid DockPanel.Dock="Top" Margin="18,14,18,6">
+                  <TextBlock Text="Плагины" FontWeight="SemiBold" FontSize="14"/>
+                  <TextBlock x:Name="pluginCount" HorizontalAlignment="Right" Foreground="#667085"/>
+                </Grid>
+                <ListBox x:Name="pluginList" BorderThickness="0" Background="Transparent" Margin="0,0,0,8"
+                         ItemContainerStyle="{StaticResource PluginItem}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                  <ListBox.ItemTemplate>
+                    <DataTemplate>
+                      <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding IsOn, Mode=TwoWay}" IsEnabled="{Binding CanToggle}"
+                                  VerticalAlignment="Center" ToolTip="{Binding SwitchTip}"/>
+                        <StackPanel Grid.Column="1" Margin="12,0,8,0" VerticalAlignment="Center">
+                          <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                          <TextBlock Text="{Binding Summary}" Foreground="#667085" FontSize="12" TextTrimming="CharacterEllipsis" Margin="0,1,0,0"/>
+                        </StackPanel>
+                        <Border Grid.Column="2" CornerRadius="9" Padding="8,1" Background="{Binding BadgeBg}" VerticalAlignment="Center">
+                          <TextBlock Text="{Binding BadgeText}" Foreground="{Binding BadgeFg}" FontSize="11" FontWeight="SemiBold"/>
+                        </Border>
+                      </Grid>
+                    </DataTemplate>
+                  </ListBox.ItemTemplate>
+                </ListBox>
+              </DockPanel>
+            </Border>
+
+            <Border Grid.Column="2" Style="{StaticResource Card}">
+              <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="22,18,22,18">
+                <StackPanel x:Name="details">
+                  <TextBlock x:Name="detTitle" FontSize="18" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                  <Border x:Name="detBadge" CornerRadius="9" Padding="9,2" HorizontalAlignment="Left" Margin="0,8,0,0">
+                    <TextBlock x:Name="detBadgeText" FontSize="12" FontWeight="SemiBold"/>
+                  </Border>
+                  <TextBlock x:Name="detText" TextWrapping="Wrap" LineHeight="20" Margin="0,12,0,0" Foreground="#344054"/>
+                  <Border Height="1" Background="#E3E6EC" Margin="0,18,0,14"/>
+                  <TextBlock Text="НАСТРОЙКИ" FontSize="11" FontWeight="SemiBold" Foreground="#667085"/>
+                  <TextBlock x:Name="noSettings" Text="У этого плагина нет настроек." Foreground="#98A2B3" Margin="0,8,0,0"/>
+                  <ItemsControl x:Name="settingsList">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate>
+                        <StackPanel Margin="0,12,0,0">
+                          <TextBlock Text="{Binding Label}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                          <ComboBox ItemsSource="{Binding Choices}" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}" Margin="0,6,0,0" MaxWidth="460" HorizontalAlignment="Left" MinWidth="300"/>
+                          <TextBlock Text="{Binding Help}" Visibility="{Binding HelpVisibility}" TextWrapping="Wrap" Foreground="#667085" FontSize="12" Margin="0,5,0,0"/>
+                          <TextBlock Text="{Binding ExactNote}" Visibility="{Binding ExactVisibility}" TextWrapping="Wrap" Foreground="#A35A00" FontSize="12" Margin="0,3,0,0"/>
+                        </StackPanel>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+              </ScrollViewer>
+            </Border>
+          </Grid>
+        </Grid>
+
+        <!-- empty state for games without plugins / not found -->
+        <Border x:Name="emptyState" Style="{StaticResource Card}" Visibility="Collapsed">
+          <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="460">
+            <TextBlock x:Name="emptyIcon" Text="&#xE823;" FontFamily="Segoe MDL2 Assets" FontSize="40" Foreground="#98A2B3" HorizontalAlignment="Center"/>
+            <TextBlock x:Name="emptyTitle" FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,14,0,0" TextAlignment="Center" TextWrapping="Wrap"/>
+            <TextBlock x:Name="emptyText" Foreground="#667085" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="0,6,0,0"/>
+            <Button x:Name="emptyButton" Style="{StaticResource Btn}" HorizontalAlignment="Center" Margin="0,16,0,0" Visibility="Collapsed"/>
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <!-- log -->
+      <Border x:Name="logPanel" Grid.Row="2" Style="{StaticResource Card}" Margin="32,14,32,0" Height="150" Visibility="Collapsed">
+        <TextBox x:Name="logBox" IsReadOnly="True" BorderThickness="0" Background="Transparent" Margin="12,8"
+                 FontFamily="Consolas" FontSize="12" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
+      </Border>
+
+      <!-- action bar -->
+      <Border Grid.Row="3" Background="White" BorderBrush="#E3E6EC" BorderThickness="0,1,0,0" Margin="0,16,0,0" Padding="32,14">
+        <Grid>
+          <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+          <StackPanel VerticalAlignment="Center">
+            <CheckBox x:Name="borderless" VerticalContentAlignment="Center" Margin="0,0,0,6" Visibility="Collapsed"/>
+            <Grid>
+              <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+              <TextBlock x:Name="statusIcon" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Top" Margin="0,3,8,0" Foreground="#667085"/>
+              <TextBlock x:Name="statusText" Grid.Column="1" Foreground="#475467" TextWrapping="Wrap"/>
+            </Grid>
+            <Button x:Name="logToggle" Style="{StaticResource LinkBtn}" Content="Показать журнал" HorizontalAlignment="Left" Margin="22,4,0,0"/>
+            <ProgressBar x:Name="progress" Height="4" Margin="0,8,0,0" Width="300" HorizontalAlignment="Left"
+                         Foreground="#2563EB" Background="#E4E7EC" BorderThickness="0" Visibility="Hidden"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
+            <Button x:Name="removeButton" Style="{StaticResource Btn}" Foreground="#B42318" Content="Удалить"/>
+            <Button x:Name="checkButton" Style="{StaticResource Btn}" Content="Проверить работу"/>
+            <Button x:Name="playButton" Style="{StaticResource Btn}">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Text="&#xE768;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" Margin="0,1,7,0"/>
+                <TextBlock Text="Играть"/>
+              </StackPanel>
+            </Button>
+            <Button x:Name="installButton" Style="{StaticResource PrimaryBtn}" Content="Установить"/>
+          </StackPanel>
+        </Grid>
+      </Border>
+    </Grid>
+  </Grid>
+</Window>

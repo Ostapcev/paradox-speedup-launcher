@@ -1,0 +1,61 @@
+{
+ "title": "Ускорение игр Paradox",
+ "games": [
+  {
+   "id": "eu4",
+   "name": "Europa Universalis IV",
+   "short": "EU4",
+   "steam_appid": "236850",
+   "exe": "eu4.exe",
+   "process": "eu4",
+   "install_dir": "Europa Universalis IV",
+   "accent": "#B8860B",
+   "manifest": "eu4_manifest.json",
+   "status": "available"
+  },
+  {
+   "id": "hoi4",
+   "name": "Hearts of Iron IV",
+   "short": "HOI4",
+   "steam_appid": "394360",
+   "exe": "hoi4.exe",
+   "process": "hoi4",
+   "install_dir": "Hearts of Iron IV",
+   "accent": "#5B6B4A",
+   "status": "planned"
+  },
+  {
+   "id": "ck3",
+   "name": "Crusader Kings III",
+   "short": "CK3",
+   "steam_appid": "1158310",
+   "exe": "binaries/ck3.exe",
+   "process": "ck3",
+   "install_dir": "Crusader Kings III",
+   "accent": "#8B2E2E",
+   "status": "planned"
+  },
+  {
+   "id": "stellaris",
+   "name": "Stellaris",
+   "short": "STL",
+   "steam_appid": "281990",
+   "exe": "stellaris.exe",
+   "process": "stellaris",
+   "install_dir": "Stellaris",
+   "accent": "#2E5C8A",
+   "status": "planned"
+  },
+  {
+   "id": "vic3",
+   "name": "Victoria 3",
+   "short": "V3",
+   "steam_appid": "529340",
+   "exe": "binaries/victoria3.exe",
+   "process": "victoria3",
+   "install_dir": "Victoria 3",
+   "accent": "#6B4C8A",
+   "status": "planned"
+  }
+ ]
+}
