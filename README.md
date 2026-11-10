@@ -51,3 +51,9 @@
 | `--game <id>` | Какую игру открыть. |
 | `--dir <папка>` | Папка этой игры. |
 | `--auto all\|exact\|uninstall\|check\|shot[:плагин[:log]]` | Сделать одно действие без участия пользователя и записать `launcher_auto.log` рядом с exe. |
+
+## Лицензия
+
+MIT, см. [LICENSE](LICENSE). Плагины, которые раздаёт установщик, идут вместе со своими лицензиями (Bellows, Hamweard, EU4 Unicode Patch, DXVK).
+
+Проект не связан с Paradox Interactive.
