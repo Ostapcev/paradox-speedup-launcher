@@ -30,7 +30,7 @@
 1. Обновите `version` и описания в `games/<id>/manifest_src.json`.
 2. Соберите файлы релиза из папки, которая копируется в игру:
    `python tools/make_release.py eu4 "..\eu4_package\EU4_uskorenie_1.37.5_v3\2_V_PAPKU_IGRY"`
-3. Загрузите в один GitHub Release все файлы `release/*.json` и `release/*_plugins.zip`.
+3. Загрузите в один GitHub Release репозитория `paradox-speedup` все файлы `release/*.json` и `release/*_plugins.zip`.
    Установщик всегда берёт их из `releases/latest/download/…`, поэтому раздавать новый exe не нужно.
 
 ## Как добавить новую игру
@@ -39,9 +39,9 @@
 2. Создайте `games/<id>/manifest_src.json` по образцу EU4.
 3. Выполните `make_release.py <id> <папка>`.
 
-## Один раз перед публикацией
+## Где лежат файлы
 
-Впишите `OWNER/REPO` в `Config.DefaultSource` (`src/Launcher.cs`) и выполните `python tools/build.py`.
+Установщик читает каталог из релизов репозитория плагинов: <https://github.com/Ostapcev/paradox-speedup/releases> (адрес — `Config.DefaultSource` в `src/Launcher.cs`). Готовый exe — в [релизах этого репозитория](https://github.com/Ostapcev/paradox-speedup-launcher/releases). Код плагинов — <https://github.com/Ostapcev/paradox-speedup>.
 
 ## Параметры командной строки
 

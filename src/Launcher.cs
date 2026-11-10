@@ -32,8 +32,8 @@ namespace SpeedLauncher
     static class Config
     {
         // Where the launcher looks for catalog.json (the other files are next to it).
-        // Replace OWNER/REPO with the GitHub repository that holds the releases.
-        public const string DefaultSource = "https://github.com/OWNER/REPO/releases/latest/download/catalog.json";
+        // Plugin releases live in the paradox-speedup repository (catalog.json, <game>_manifest.json, <game>_plugins.zip).
+        public const string DefaultSource = "https://github.com/Ostapcev/paradox-speedup/releases/latest/download/catalog.json";
         public const string AppVersion = "2.0";
         public const string StateFile = "speedup_launcher_state.txt";
         public const string BackupDir = "speedup_launcher_backup";

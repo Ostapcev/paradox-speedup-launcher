@@ -13,7 +13,7 @@ games/GAME_ID/manifest_src.json exists there, then writes these files to OUT_DIR
 - catalog.json, rebuilt from catalog_src.json.
 
 Upload everything in release/ (except the exe, if you like) to one GitHub release.
-The launcher reads https://github.com/OWNER/REPO/releases/latest/download/catalog.json
+The launcher reads https://github.com/Ostapcev/paradox-speedup/releases/latest/download/catalog.json
 and finds the other files next to it.
 """
 import hashlib
