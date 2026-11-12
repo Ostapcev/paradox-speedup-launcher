@@ -1,10 +1,15 @@
 {
- "version": "3",
- "title": "Ускорение EU4 — версия 3",
+ "version": "4",
+ "title": "Ускорение EU4 — версия 4",
  "game_version": "1.37.5",
  "exe_sha256": [
-  "9ad3efe1af169f40ee577f9dae5debbc87af6fb8b5450fb345ebf110dc4d771a"
+  "9ad3efe1af169f40ee577f9dae5debbc87af6fb8b5450fb345ebf110dc4d771a",
+  "5f4145ce5ff9a4140cc4d14440920382b698dd91e1cdae1d1dc053357d9388ee"
  ],
+ "exe_builds": {
+  "9ad3efe1af169f40ee577f9dae5debbc87af6fb8b5450fb345ebf110dc4d771a": "Steam",
+  "5f4145ce5ff9a4140cc4d14440920382b698dd91e1cdae1d1dc053357d9388ee": "GOG"
+ },
  "package": "eu4_plugins.zip",
  "components": [
   {
@@ -772,13 +777,16 @@
     "plugins/eu4_menu_patch.dll"
    ],
    "ini": "plugins/eu4_menu_patch.ini",
-   "description": "«Exit to Menu» и «Back» сразу возвращают в главное меню, а не перезапускают игру целиком. На расчёты внутри партии не влияет.\r\n\r\nПеренос открытого мода Hamweard (MIT).",
+   "description": "«Exit to Menu» и «Back» сразу возвращают в главное меню, а не перезапускают игру целиком. На расчёты внутри партии не влияет.\r\n\r\nПеренос открытого мода Hamweard (MIT).\r\n\r\nТолько для версии игры из Steam: в версии GOG часть кода меню устроена иначе, и плагин там не включается (установщик его не ставит).",
    "fixed": [
     [
      "menu",
      "mode",
      "on"
     ]
+   ],
+   "builds": [
+    "Steam"
    ]
   },
   {

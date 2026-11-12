@@ -28,8 +28,8 @@ using Microsoft.Win32;
 [assembly: AssemblyProduct("Ускорение игр Paradox")]
 [assembly: AssemblyCompany("Ostapcev")]
 [assembly: AssemblyCopyright("MIT, github.com/Ostapcev/paradox-speedup-launcher")]
-[assembly: AssemblyVersion("2.0.1.0")]
-[assembly: AssemblyFileVersion("2.0.1.0")]
+[assembly: AssemblyVersion("2.1.0.0")]
+[assembly: AssemblyFileVersion("2.1.0.0")]
 
 namespace SpeedLauncher
 {
@@ -38,7 +38,7 @@ namespace SpeedLauncher
         // Where the launcher looks for catalog.json (the other files are next to it).
         // Plugin releases live in the paradox-speedup repository (catalog.json, <game>_manifest.json, <game>_plugins.zip).
         public const string DefaultSource = "https://github.com/Ostapcev/paradox-speedup/releases/latest/download/catalog.json";
-        public const string AppVersion = "2.0.1";
+        public const string AppVersion = "2.1.0";
         public const string StateFile = "speedup_launcher_state.txt";
         public const string BackupDir = "speedup_launcher_backup";
     }
@@ -116,6 +116,7 @@ namespace SpeedLauncher
         public string Id, Title, Description, Ini;
         public bool Required, Exact, DefaultOn = true;
         public List<string> Files = new List<string>();
+        public List<string> Builds = new List<string>();   // empty: every build in exe_builds
         public List<Setting> Settings = new List<Setting>();
         public List<string[]> Fixed = new List<string[]>();
         public IEnumerable<string> AllFiles()
@@ -132,6 +133,7 @@ namespace SpeedLauncher
         public string Version, Title, GameVersion, Package, PackageSha256;
         public List<string> ExeSha256 = new List<string>();
         public Dictionary<string, string> FileSha256 = new Dictionary<string, string>();
+        public Dictionary<string, string> ExeBuild = new Dictionary<string, string>();   // exe sha256 -> "Steam" / "GOG"
         public List<Component> Components = new List<Component>();
         public Borderless Borderless;
 
@@ -144,6 +146,8 @@ namespace SpeedLauncher
                 Package = J.S(root, "package"), PackageSha256 = J.S(root, "package_sha256")
             };
             foreach (var h in J.L(root, "exe_sha256")) m.ExeSha256.Add(Convert.ToString(h).ToLowerInvariant());
+            var eb = J.O(root, "exe_builds");
+            if (eb != null) foreach (var kv in eb) m.ExeBuild[kv.Key.ToLowerInvariant()] = Convert.ToString(kv.Value);
             var fh = J.O(root, "file_sha256");
             if (fh != null) foreach (var kv in fh) m.FileSha256[kv.Key] = Convert.ToString(kv.Value);
             var bl = J.O(root, "borderless");
@@ -161,6 +165,7 @@ namespace SpeedLauncher
                     Required = J.B(c, "required", false), Exact = J.B(c, "exact", true), DefaultOn = J.B(c, "default", true)
                 };
                 foreach (var f in J.L(c, "files")) comp.Files.Add(Convert.ToString(f));
+                foreach (var b in J.L(c, "builds")) comp.Builds.Add(Convert.ToString(b));
                 foreach (IDictionary<string, object> s in J.L(c, "settings"))
                 {
                     var st = new Setting
@@ -409,6 +414,73 @@ namespace SpeedLauncher
                 }
                 catch { }
             }
+            return FindGog(g);
+        }
+
+        static string Value(RegistryKey parent, string sub, string name)
+        {
+            using (var k = parent.OpenSubKey(sub)) return k == null ? null : k.GetValue(name) as string;
+        }
+
+        // GOG: GOG Galaxy and the offline installers register the game under GOG.com\Games and in
+        // the uninstall list; then the default install folders.
+        static string FindGog(GameInfo g)
+        {
+            var candidates = new List<string>();
+            foreach (var hive in new[] { Registry.LocalMachine, Registry.CurrentUser })
+                foreach (var key in new[] { @"SOFTWARE\WOW6432Node\GOG.com\Games", @"SOFTWARE\GOG.com\Games" })
+                {
+                    try
+                    {
+                        using (var k = hive.OpenSubKey(key))
+                        {
+                            if (k == null) continue;
+                            foreach (var id in k.GetSubKeyNames())
+                            {
+                                var name = Value(k, id, "gameName");
+                                var path = Value(k, id, "path");
+                                if (path != null && name != null && name.IndexOf(g.Name, StringComparison.OrdinalIgnoreCase) >= 0)
+                                    candidates.Add(path);
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            foreach (var key in new[] { @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall",
+                                        @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" })
+            {
+                try
+                {
+                    using (var k = Registry.LocalMachine.OpenSubKey(key))
+                    {
+                        if (k == null) continue;
+                        foreach (var id in k.GetSubKeyNames())
+                        {
+                            var name = Value(k, id, "DisplayName");
+                            var publisher = Value(k, id, "Publisher");
+                            var path = Value(k, id, "InstallLocation");
+                            if (path != null && name != null && publisher != null &&
+                                publisher.IndexOf("GOG", StringComparison.OrdinalIgnoreCase) >= 0 &&
+                                name.IndexOf(g.Name, StringComparison.OrdinalIgnoreCase) >= 0)
+                                candidates.Add(path);
+                        }
+                    }
+                }
+                catch { }
+            }
+            var install = g.InstallDir ?? g.Name;
+            candidates.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"GOG Galaxy\Games", install));
+            try
+            {
+                foreach (var drive in DriveInfo.GetDrives())
+                    if (drive.DriveType == DriveType.Fixed) candidates.Add(Path.Combine(drive.Name, "GOG Games", install));
+            }
+            catch { }
+            foreach (var c in candidates)
+            {
+                try { if (File.Exists(Util.Local(c, g.Exe))) return c.TrimEnd('\\'); }
+                catch { }
+            }
             return null;
         }
     }
@@ -449,20 +521,37 @@ namespace SpeedLauncher
             set
             {
                 if (C.Required) value = true;
+                if (Unsupported) value = false;
                 if (isOn == value) return;
                 isOn = value;
                 On("IsOn");
                 if (Changed != null) Changed(this);
             }
         }
-        public void SetQuietly(bool value) { isOn = C.Required || value; On("IsOn"); }
+        public void SetQuietly(bool value) { isOn = !Unsupported && (C.Required || value); On("IsOn"); }
+        // the plugin does not work on the game build in the chosen folder: off and locked
+        public bool Unsupported;
+        public void SetBuild(string build)
+        {
+            Unsupported = build != null && C.Builds.Count > 0 &&
+                !C.Builds.Any(b => string.Equals(b, build, StringComparison.OrdinalIgnoreCase));
+            if (Unsupported) isOn = false;
+            foreach (var n in new[] { "IsOn", "CanToggle", "SwitchTip", "BadgeText", "BadgeBg", "BadgeFg" }) On(n);
+        }
         public string Title { get { return C.Title; } }
         public string Summary { get { return Util.FirstSentence(C.Description, 90); } }
-        public bool CanToggle { get { return !C.Required; } }
-        public string SwitchTip { get { return C.Required ? "Нужен для работы остальных плагинов" : null; } }
-        public string BadgeText { get { return C.Required ? "основа" : C.Exact ? "точный" : "меняет ход игры"; } }
-        public Brush BadgeBg { get { return Util.Brush(C.Required ? "#EEF0F4" : C.Exact ? "#E7F6EC" : "#FFF1DD"); } }
-        public Brush BadgeFg { get { return Util.Brush(C.Required ? "#556070" : C.Exact ? "#1E7B3C" : "#A35A00"); } }
+        public bool CanToggle { get { return !C.Required && !Unsupported; } }
+        public string SwitchTip
+        {
+            get
+            {
+                return Unsupported ? "Работает только в версии игры из " + string.Join(" / ", C.Builds)
+                    : C.Required ? "Нужен для работы остальных плагинов" : null;
+            }
+        }
+        public string BadgeText { get { return Unsupported ? "только " + string.Join(" / ", C.Builds) : C.Required ? "основа" : C.Exact ? "точный" : "меняет ход игры"; } }
+        public Brush BadgeBg { get { return Util.Brush(Unsupported || C.Required ? "#EEF0F4" : C.Exact ? "#E7F6EC" : "#FFF1DD"); } }
+        public Brush BadgeFg { get { return Util.Brush(Unsupported || C.Required ? "#556070" : C.Exact ? "#1E7B3C" : "#A35A00"); } }
     }
 
     class SettingVM : Notifier
@@ -515,6 +604,7 @@ namespace SpeedLauncher
         GameVM game;          // selected game
         Manifest manifest;    // its manifest (null while loading or for planned games)
         bool versionOk;
+        string build;   // "Steam" / "GOG" for an accepted eu4.exe, else null
         readonly Dictionary<string, string> values = new Dictionary<string, string>();
         readonly ObservableCollection<GameVM> games = new ObservableCollection<GameVM>();
         readonly ObservableCollection<PluginVM> plugins = new ObservableCollection<PluginVM>();
@@ -815,7 +905,7 @@ namespace SpeedLauncher
             if (game.Dir == null)
             {
                 SetChip("chipVersion", "игра не найдена", "warn");
-                ShowEmpty("\uE721", "Не нашёл " + game.Name + " в Steam",
+                ShowEmpty("\uE721", "Не нашёл " + game.Name + " в Steam и GOG",
                     "Укажите папку, где установлена игра (в ней лежит " + game.Game.Exe.Replace('/', '\\') + ").", "Выбрать папку игры…");
                 Status("Укажите папку игры.", "warn");
                 UpdateButtons();
@@ -826,13 +916,17 @@ namespace SpeedLauncher
             try { hash = Util.Sha256File(Util.Local(game.Dir, game.Game.Exe)); }
             catch (Exception ex) { Log("Не удалось прочитать " + game.Game.Exe + ": " + ex.Message); }
             versionOk = hash != null && manifest.ExeSha256.Contains(hash);
-            if (versionOk) SetChip("chipVersion", "версия " + manifest.GameVersion + " — подходит", "ok");
+            build = null;
+            if (versionOk && !manifest.ExeBuild.TryGetValue(hash, out build)) build = null;
+            foreach (var p in plugins) p.SetBuild(build);
+            if (build != null) Log("Игра: " + game.Dir + " (версия из " + build + ")");
+            if (versionOk) SetChip("chipVersion", "версия " + manifest.GameVersion + (build != null ? " " + build : "") + " — подходит", "ok");
             else SetChip("chipVersion", "версия игры не подходит (нужна " + manifest.GameVersion + ")", "error");
             ReadInstalledState();
             RefreshGameStatus(game);
             var installed = InstalledVersion();
             if (!versionOk)
-                Status("Плагины сделаны для " + game.Game.Short + " " + manifest.GameVersion + " из Steam. С другой версией игры они не включатся, поэтому установка выключена.", "error");
+                Status("Плагины сделаны для " + game.Game.Short + " " + manifest.GameVersion + " из Steam или GOG. С другой версией игры они не включатся, поэтому установка выключена.", "error");
             else if (installed == null)
                 Status("Готово к установке. Выберите режим и нажмите «Установить».", "info");
             else if (installed != manifest.Version)
@@ -928,7 +1022,7 @@ namespace SpeedLauncher
             foreach (var p in plugins)
             {
                 var c = p.C;
-                if (p.IsOn != (c.Required || (all ? c.DefaultOn : c.Exact && c.DefaultOn))) return false;
+                if (p.IsOn != (!p.Unsupported && (c.Required || (all ? c.DefaultOn : c.Exact && c.DefaultOn)))) return false;
                 foreach (var s in c.Settings)
                     if (values[Key(c, s)] != (!all && s.ExactValue != null ? s.ExactValue : s.Default)) return false;
             }
@@ -1061,7 +1155,18 @@ namespace SpeedLauncher
 
         void Play()
         {
-            try { Process.Start("steam://rungameid/" + game.Game.AppId); Status("Запускаю " + game.Name + " через Steam…", "info"); }
+            try
+            {
+                bool steam = build == "Steam" ||
+                    (build == null && game.Dir.IndexOf(@"\steamapps\", StringComparison.OrdinalIgnoreCase) >= 0);
+                if (steam) { Process.Start("steam://rungameid/" + game.Game.AppId); Status("Запускаю " + game.Name + " через Steam…", "info"); }
+                else
+                {
+                    var exe = Util.Local(game.Dir, game.Game.Exe);
+                    Process.Start(new ProcessStartInfo(exe) { WorkingDirectory = Path.GetDirectoryName(exe), UseShellExecute = true });
+                    Status("Запускаю " + game.Name + "…", "info");
+                }
+            }
             catch (Exception ex) { Status("Не удалось запустить: " + ex.Message, "error"); }
         }
 
