@@ -201,7 +201,11 @@
           <TextBlock Text="плагины для игр Paradox" Foreground="#8C95A6" Margin="40,2,0,0"/>
         </StackPanel>
         <TextBlock DockPanel.Dock="Top" Text="ИГРЫ" Foreground="#6B7486" FontSize="11" FontWeight="SemiBold" Margin="24,4,0,6"/>
-        <TextBlock x:Name="appVersion" DockPanel.Dock="Bottom" Foreground="#596274" FontSize="11" Margin="24,0,0,18"/>
+        <DockPanel DockPanel.Dock="Bottom" Margin="24,0,18,18">
+          <Button x:Name="langButton" DockPanel.Dock="Right" Style="{StaticResource LinkBtn}" Foreground="#8C95A6" FontSize="11"
+                  Margin="0" VerticalAlignment="Center" ToolTip="Language / Язык"/>
+          <TextBlock x:Name="appVersion" Foreground="#596274" FontSize="11" VerticalAlignment="Center"/>
+        </DockPanel>
         <ListBox x:Name="gameList" Background="Transparent" BorderThickness="0" ItemContainerStyle="{StaticResource GameItem}"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
           <ListBox.ItemTemplate>

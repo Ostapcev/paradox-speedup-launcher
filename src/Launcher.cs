@@ -24,12 +24,12 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 
-[assembly: AssemblyTitle("Ускорение игр Paradox — установщик")]
-[assembly: AssemblyProduct("Ускорение игр Paradox")]
+[assembly: AssemblyTitle("Paradox games speed-up — installer / Ускорение игр Paradox — установщик")]
+[assembly: AssemblyProduct("Paradox games speed-up / Ускорение игр Paradox")]
 [assembly: AssemblyCompany("Ostapcev")]
 [assembly: AssemblyCopyright("MIT, github.com/Ostapcev/paradox-speedup-launcher")]
-[assembly: AssemblyVersion("2.1.0.0")]
-[assembly: AssemblyFileVersion("2.1.0.0")]
+[assembly: AssemblyVersion("2.2.0.0")]
+[assembly: AssemblyFileVersion("2.2.0.0")]
 
 namespace SpeedLauncher
 {
@@ -38,14 +38,38 @@ namespace SpeedLauncher
         // Where the launcher looks for catalog.json (the other files are next to it).
         // Plugin releases live in the paradox-speedup repository (catalog.json, <game>_manifest.json, <game>_plugins.zip).
         public const string DefaultSource = "https://github.com/Ostapcev/paradox-speedup/releases/latest/download/catalog.json";
-        public const string AppVersion = "2.1.0";
+        public const string AppVersion = "2.2.0";
         public const string StateFile = "speedup_launcher_state.txt";
         public const string BackupDir = "speedup_launcher_backup";
+    }
+
+    // ================================================================ language
+    // Russian or English: --lang, then the saved choice, then Windows' display language.
+    static class L
+    {
+        public static bool En;
+        public static string Code { get { return En ? "en" : "ru"; } }
+        public static string T(string ru, string en) { return En ? en : ru; }
+
+        public static void Choose(string arg)
+        {
+            var saved = arg ?? Prefs.GetDir("lang");
+            if (saved == "en" || saved == "ru") { En = saved == "en"; return; }
+            var ui = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+            En = !(ui == "ru" || ui == "be" || ui == "kk");
+        }
     }
 
     // ================================================================ json helpers
     static class J
     {
+        // A text field in the chosen language: "key_en" in English when present, else "key".
+        public static string T(IDictionary<string, object> o, string key)
+        {
+            if (SpeedLauncher.L.En) { var en = S(o, key + "_en"); if (en != null) return en; }
+            return S(o, key);
+        }
+
         public static string S(IDictionary<string, object> d, string k)
         {
             object v;
@@ -89,7 +113,7 @@ namespace SpeedLauncher
         public static Catalog Parse(string json)
         {
             var root = J.Parse(json);
-            var c = new Catalog { Title = J.S(root, "title") };
+            var c = new Catalog { Title = J.T(root, "title") };
             foreach (IDictionary<string, object> g in J.L(root, "games"))
                 c.Games.Add(new GameInfo
                 {
@@ -142,7 +166,7 @@ namespace SpeedLauncher
             var root = J.Parse(json);
             var m = new Manifest
             {
-                Version = J.S(root, "version"), Title = J.S(root, "title"), GameVersion = J.S(root, "game_version"),
+                Version = J.S(root, "version"), Title = J.T(root, "title"), GameVersion = J.S(root, "game_version"),
                 Package = J.S(root, "package"), PackageSha256 = J.S(root, "package_sha256")
             };
             foreach (var h in J.L(root, "exe_sha256")) m.ExeSha256.Add(Convert.ToString(h).ToLowerInvariant());
@@ -155,13 +179,13 @@ namespace SpeedLauncher
                 m.Borderless = new Borderless
                 {
                     Component = J.S(bl, "component"), File = J.S(bl, "file"), Pattern = J.S(bl, "pattern"),
-                    Replace = J.S(bl, "replace"), Label = J.S(bl, "label") ?? "Переключить игру в режим «без рамки»"
+                    Replace = J.S(bl, "replace"), Label = J.T(bl, "label") ?? L.T("Переключить игру в режим «без рамки»", "Switch the game to borderless fullscreen")
                 };
             foreach (IDictionary<string, object> c in J.L(root, "components"))
             {
                 var comp = new Component
                 {
-                    Id = J.S(c, "id"), Title = J.S(c, "title"), Description = J.S(c, "description"), Ini = J.S(c, "ini"),
+                    Id = J.S(c, "id"), Title = J.T(c, "title"), Description = J.T(c, "description"), Ini = J.S(c, "ini"),
                     Required = J.B(c, "required", false), Exact = J.B(c, "exact", true), DefaultOn = J.B(c, "default", true)
                 };
                 foreach (var f in J.L(c, "files")) comp.Files.Add(Convert.ToString(f));
@@ -170,13 +194,13 @@ namespace SpeedLauncher
                 {
                     var st = new Setting
                     {
-                        Section = J.S(s, "section"), Key = J.S(s, "key"), Label = J.S(s, "label"), Default = J.S(s, "default"),
-                        ExactValue = J.S(s, "exact_value"), Help = J.S(s, "help") ?? ""
+                        Section = J.S(s, "section"), Key = J.S(s, "key"), Label = J.T(s, "label"), Default = J.S(s, "default"),
+                        ExactValue = J.S(s, "exact_value"), Help = J.T(s, "help") ?? ""
                     };
                     foreach (var ch in J.L(s, "choices"))
                     {
                         var pair = ((IEnumerable)ch).Cast<object>().Select(Convert.ToString).ToArray();
-                        st.Choices.Add(new Choice { Value = pair[0], Label = pair.Length > 1 ? pair[1] : pair[0] });
+                        st.Choices.Add(new Choice { Value = pair[0], Label = L.En && pair.Length > 2 ? pair[2] : pair.Length > 1 ? pair[1] : pair[0] });
                     }
                     comp.Settings.Add(st);
                 }
@@ -545,11 +569,11 @@ namespace SpeedLauncher
         {
             get
             {
-                return Unsupported ? "Работает только в версии игры из " + string.Join(" / ", C.Builds)
-                    : C.Required ? "Нужен для работы остальных плагинов" : null;
+                return Unsupported ? L.T("Работает только в версии игры из ", "Works only in the game version from ") + string.Join(" / ", C.Builds)
+                    : C.Required ? L.T("Нужен для работы остальных плагинов", "Needed by the other plugins") : null;
             }
         }
-        public string BadgeText { get { return Unsupported ? "только " + string.Join(" / ", C.Builds) : C.Required ? "основа" : C.Exact ? "точный" : "меняет ход игры"; } }
+        public string BadgeText { get { return Unsupported ? L.T("только ", "only ") + string.Join(" / ", C.Builds) : C.Required ? L.T("основа", "base") : C.Exact ? L.T("точный", "exact") : L.T("меняет ход игры", "changes gameplay"); } }
         public Brush BadgeBg { get { return Util.Brush(Unsupported || C.Required ? "#EEF0F4" : C.Exact ? "#E7F6EC" : "#FFF1DD"); } }
         public Brush BadgeFg { get { return Util.Brush(Unsupported || C.Required ? "#556070" : C.Exact ? "#1E7B3C" : "#A35A00"); } }
     }
@@ -569,7 +593,7 @@ namespace SpeedLauncher
             {
                 if (S.ExactValue == null || S.ExactValue == S.Default) return null;
                 var ch = S.Choices.FirstOrDefault(x => x.Value == S.ExactValue);
-                return "В режиме «Только точные»: " + (ch == null ? S.ExactValue : ch.Label) + ".";
+                return L.T("В режиме «Только точные»: ", "In “Exact only” mode: ") + (ch == null ? S.ExactValue : ch.Label) + ".";
             }
         }
         public Visibility ExactVisibility { get { return ExactNote == null ? Visibility.Collapsed : Visibility.Visible; } }
@@ -626,7 +650,9 @@ namespace SpeedLauncher
             this.source = source;
             this.presetGame = presetGame;
             this.presetDir = presetDir;
-            E<TextBlock>("appVersion").Text = "Установщик " + Config.AppVersion;
+            E<TextBlock>("appVersion").Text = L.T("Установщик ", "Installer ") + Config.AppVersion;
+            E<Button>("langButton").Content = L.T("English", "Русский");
+            E<Button>("langButton").Click += (s, e) => SwitchLanguage();
             GameList.ItemsSource = games;
             PluginList.ItemsSource = plugins;
             GameList.SelectionChanged += (s, e) => { var g = GameList.SelectedItem as GameVM; if (g != null) SelectGame(g); };
@@ -669,7 +695,7 @@ namespace SpeedLauncher
             var panel = E<Border>("logPanel");
             bool visible = show ?? panel.Visibility != Visibility.Visible;
             panel.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
-            E<Button>("logToggle").Content = visible ? "Скрыть журнал" : "Показать журнал";
+            E<Button>("logToggle").Content = visible ? L.T("Скрыть журнал", "Hide log") : L.T("Показать журнал", "Show log");
         }
 
         void SetProgress(double percent)
@@ -682,13 +708,13 @@ namespace SpeedLauncher
 
         void Box(string text, MessageBoxImage icon)
         {
-            if (Program.Auto != null) { Log("[сообщение] " + text.Replace('\n', ' ')); return; }
+            if (Program.Auto != null) { Log(L.T("[сообщение] ", "[message] ") + text.Replace('\n', ' ')); return; }
             MessageBox.Show(w, text, w.Title, MessageBoxButton.OK, icon);
         }
 
         bool Ask(string text)
         {
-            if (Program.Auto != null) { Log("[вопрос, ответ «да»] " + text.Replace('\n', ' ')); return true; }
+            if (Program.Auto != null) { Log(L.T("[вопрос, ответ «да»] ", "[question, answered yes] ") + text.Replace('\n', ' ')); return true; }
             return MessageBox.Show(w, text, w.Title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
         }
 
@@ -705,7 +731,7 @@ namespace SpeedLauncher
             var installedVersion = ready ? InstalledVersion() : null;
             var install = E<Button>("installButton");
             install.IsEnabled = !busy && ready && versionOk;
-            install.Content = installedVersion == null ? "Установить" : installedVersion == manifest.Version ? "Применить" : "Обновить";
+            install.Content = installedVersion == null ? L.T("Установить", "Install") : installedVersion == manifest.Version ? L.T("Применить", "Apply") : L.T("Обновить", "Update");
             E<Button>("removeButton").IsEnabled = !busy && installedVersion != null;
             E<Button>("checkButton").IsEnabled = !busy && installedVersion != null;
             E<Button>("playButton").IsEnabled = !busy && game != null && game.Dir != null;
@@ -749,7 +775,7 @@ namespace SpeedLauncher
         async Task Startup()
         {
             SetBusy(true);
-            Status("Загружаю список игр и плагинов…", "busy");
+            Status(L.T("Загружаю список игр и плагинов…", "Loading the list of games and plugins…"), "busy");
             Exception failure = null;
             try { catalog = Catalog.Parse(await ReadText(CatalogPath)); }
             catch (Exception ex) { failure = ex; }
@@ -757,10 +783,10 @@ namespace SpeedLauncher
             {
                 var ex = failure;
                 SetBusy(false);
-                Status("Не удалось загрузить список плагинов: " + ex.Message, "error");
+                Status(L.T("Не удалось загрузить список плагинов: ", "Could not load the plugin list: ") + ex.Message, "error");
                 ToggleLog(true);
-                ShowEmpty("\uE871", "Нет связи с сервером плагинов",
-                    "Проверьте подключение к интернету и запустите установщик ещё раз.\n" + ex.Message, null);
+                ShowEmpty("\uE871", L.T("Нет связи с сервером плагинов", "No connection to the plugin server"),
+                    L.T("Проверьте подключение к интернету и запустите установщик ещё раз.\n", "Check your internet connection and start the installer again.\n") + ex.Message, null);
                 if (Program.Auto != null) await RunAuto();
                 return;
             }
@@ -789,11 +815,11 @@ namespace SpeedLauncher
 
         void RefreshGameStatus(GameVM vm)
         {
-            if (!vm.Game.Available) { vm.Status = vm.Dir != null ? "игра есть · плагины скоро" : "плагины скоро"; vm.StatusBrush = null; return; }
-            if (vm.Dir == null) { vm.Status = "игра не найдена"; vm.StatusBrush = null; return; }
+            if (!vm.Game.Available) { vm.Status = vm.Dir != null ? L.T("игра есть · плагины скоро", "game found · plugins coming") : L.T("плагины скоро", "plugins coming"); vm.StatusBrush = null; return; }
+            if (vm.Dir == null) { vm.Status = L.T("игра не найдена", "game not found"); vm.StatusBrush = null; return; }
             var v = InstalledVersion(vm.Dir);
-            if (v == null) { vm.Status = "плагины не установлены"; vm.StatusBrush = Util.Brush("#8C95A6"); }
-            else { vm.Status = "плагины установлены"; vm.StatusBrush = Util.Brush("#6CCB8A"); }
+            if (v == null) { vm.Status = L.T("плагины не установлены", "plugins not installed"); vm.StatusBrush = Util.Brush("#8C95A6"); }
+            else { vm.Status = L.T("плагины установлены", "plugins installed"); vm.StatusBrush = Util.Brush("#6CCB8A"); }
         }
 
         // ------------------------------------------------------------ game selection
@@ -813,28 +839,28 @@ namespace SpeedLauncher
             E<Border>("headLogo").Background = Util.Brush(gi.Accent);
             E<TextBlock>("headShort").Text = gi.Short;
             E<TextBlock>("headName").Text = gi.Name;
-            E<TextBlock>("gameDirText").Text = g.Dir ?? "папка игры не найдена";
+            E<TextBlock>("gameDirText").Text = g.Dir ?? L.T("папка игры не найдена", "game folder not found");
             E<CheckBox>("borderless").Visibility = Visibility.Collapsed;
             SetChip("chipInstalled", null, null);
             if (!gi.Available)
             {
-                SetChip("chipVersion", "в разработке", "gray");
-                ShowEmpty("\uE823", "Плагины для " + gi.Name + " пока в разработке",
-                    "Когда они выйдут, они появятся здесь сами — установщик обновлять не нужно.", null);
-                Status("Для этой игры плагинов пока нет.", "info");
+                SetChip("chipVersion", L.T("в разработке", "in development"), "gray");
+                ShowEmpty("\uE823", L.T("Плагины для ", "Plugins for ") + gi.Name + L.T(" пока в разработке", " are in development"),
+                    L.T("Когда они выйдут, они появятся здесь сами — установщик обновлять не нужно.", "When they are released they will appear here by themselves — no need to update the installer."), null);
+                Status(L.T("Для этой игры плагинов пока нет.", "No plugins for this game yet."), "info");
                 UpdateButtons();
                 return;
             }
             if (!manifests.ContainsKey(gi.Id))
             {
                 SetBusy(true);
-                Status("Загружаю описание плагинов для " + gi.Name + "…", "busy");
+                Status(L.T("Загружаю описание плагинов для ", "Loading the plugin descriptions for ") + gi.Name + "…", "busy");
                 try { manifests[gi.Id] = Manifest.Parse(await ReadText(Sibling(gi.Manifest))); }
                 catch (Exception ex)
                 {
                     SetBusy(false);
-                    Status("Не удалось загрузить описание плагинов: " + ex.Message, "error");
-                    ShowEmpty("\uE871", "Не удалось загрузить плагины", ex.Message, null);
+                    Status(L.T("Не удалось загрузить описание плагинов: ", "Could not load the plugin descriptions: ") + ex.Message, "error");
+                    ShowEmpty("\uE871", L.T("Не удалось загрузить плагины", "Could not load the plugins"), ex.Message, null);
                     return;
                 }
                 SetBusy(false);
@@ -882,13 +908,13 @@ namespace SpeedLauncher
         {
             if (game == null) return;
             var exe = game.Game.Exe.Replace('/', '\\');
-            using (var dlg = new System.Windows.Forms.FolderBrowserDialog { Description = "Папка " + game.Name + " (в ней лежит " + exe + ")" })
+            using (var dlg = new System.Windows.Forms.FolderBrowserDialog { Description = L.T("Папка ", "Folder of ") + game.Name + L.T(" (в ней лежит ", " (it contains ") + exe + ")" })
             {
                 if (game.Dir != null) dlg.SelectedPath = game.Dir;
                 if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
                 if (!File.Exists(Util.Local(dlg.SelectedPath, game.Game.Exe)))
                 {
-                    Box("В этой папке нет " + exe + ". Выберите папку, где установлена игра.", MessageBoxImage.Warning);
+                    Box(L.T("В этой папке нет ", "This folder has no ") + exe + L.T(". Выберите папку, где установлена игра.", ". Choose the folder where the game is installed."), MessageBoxImage.Warning);
                     return;
                 }
                 game.Dir = dlg.SelectedPath;
@@ -904,35 +930,35 @@ namespace SpeedLauncher
             if (manifest == null) return;
             if (game.Dir == null)
             {
-                SetChip("chipVersion", "игра не найдена", "warn");
-                ShowEmpty("\uE721", "Не нашёл " + game.Name + " в Steam и GOG",
-                    "Укажите папку, где установлена игра (в ней лежит " + game.Game.Exe.Replace('/', '\\') + ").", "Выбрать папку игры…");
-                Status("Укажите папку игры.", "warn");
+                SetChip("chipVersion", L.T("игра не найдена", "game not found"), "warn");
+                ShowEmpty("\uE721", L.T("Не нашёл ", "Could not find ") + game.Name + L.T(" в Steam и GOG", " in Steam or GOG"),
+                    L.T("Укажите папку, где установлена игра (в ней лежит ", "Choose the folder where the game is installed (it contains ") + game.Game.Exe.Replace('/', '\\') + ").", L.T("Выбрать папку игры…", "Choose the game folder…"));
+                Status(L.T("Укажите папку игры.", "Choose the game folder."), "warn");
                 UpdateButtons();
                 return;
             }
             ShowContent();
             string hash = null;
             try { hash = Util.Sha256File(Util.Local(game.Dir, game.Game.Exe)); }
-            catch (Exception ex) { Log("Не удалось прочитать " + game.Game.Exe + ": " + ex.Message); }
+            catch (Exception ex) { Log(L.T("Не удалось прочитать ", "Could not read ") + game.Game.Exe + ": " + ex.Message); }
             versionOk = hash != null && manifest.ExeSha256.Contains(hash);
             build = null;
             if (versionOk && !manifest.ExeBuild.TryGetValue(hash, out build)) build = null;
             foreach (var p in plugins) p.SetBuild(build);
-            if (build != null) Log("Игра: " + game.Dir + " (версия из " + build + ")");
-            if (versionOk) SetChip("chipVersion", "версия " + manifest.GameVersion + (build != null ? " " + build : "") + " — подходит", "ok");
-            else SetChip("chipVersion", "версия игры не подходит (нужна " + manifest.GameVersion + ")", "error");
+            if (build != null) Log(L.T("Игра: ", "Game: ") + game.Dir + L.T(" (версия из ", " (version from ") + build + ")");
+            if (versionOk) SetChip("chipVersion", L.T("версия ", "version ") + manifest.GameVersion + (build != null ? " " + build : "") + L.T(" — подходит", " — compatible"), "ok");
+            else SetChip("chipVersion", L.T("версия игры не подходит (нужна ", "game version does not match (needs ") + manifest.GameVersion + ")", "error");
             ReadInstalledState();
             RefreshGameStatus(game);
             var installed = InstalledVersion();
             if (!versionOk)
-                Status("Плагины сделаны для " + game.Game.Short + " " + manifest.GameVersion + " из Steam или GOG. С другой версией игры они не включатся, поэтому установка выключена.", "error");
+                Status(L.T("Плагины сделаны для ", "The plugins are made for ") + game.Game.Short + " " + manifest.GameVersion + L.T(" из Steam или GOG. С другой версией игры они не включатся, поэтому установка выключена.", " from Steam or GOG. They will not turn on with another game version, so installing is disabled."), "error");
             else if (installed == null)
-                Status("Готово к установке. Выберите режим и нажмите «Установить».", "info");
+                Status(L.T("Готово к установке. Выберите режим и нажмите «Установить».", "Ready to install. Choose a mode and press “Install”."), "info");
             else if (installed != manifest.Version)
-                Status("Доступна версия плагинов " + manifest.Version + ". Нажмите «Обновить» — ваши настройки сохранятся.", "warn");
+                Status(L.T("Доступна версия плагинов ", "Plugins version available: ") + manifest.Version + L.T(". Нажмите «Обновить» — ваши настройки сохранятся.", ". Press “Update” — your settings are kept."), "warn");
             else
-                Status("Плагины установлены. Изменили настройки — нажмите «Применить».", "ok");
+                Status(L.T("Плагины установлены. Изменили настройки — нажмите «Применить».", "Plugins installed. Changed the settings? Press “Apply”."), "ok");
             UpdateButtons();
         }
 
@@ -949,7 +975,7 @@ namespace SpeedLauncher
             var pluginsDir = Path.Combine(dir, "plugins");
             bool manual = Directory.Exists(pluginsDir) && Directory.GetFiles(pluginsDir, "*.dll").Length > 0 &&
                 File.Exists(Path.Combine(dir, "VERSION.dll"));
-            return manual ? "вручную" : null;
+            return manual ? L.T("вручную", "manually") : null;
         }
 
         string InstalledVersion() { return game == null ? null : InstalledVersion(game.Dir); }
@@ -959,10 +985,10 @@ namespace SpeedLauncher
         void ReadInstalledState()
         {
             var installed = InstalledVersion();
-            if (installed == null) SetChip("chipInstalled", "плагины не установлены", "gray");
-            else if (installed == manifest.Version) SetChip("chipInstalled", "установлены плагины версии " + installed, "blue");
-            else if (installed == "вручную") SetChip("chipInstalled", "плагины поставлены вручную · доступна версия " + manifest.Version, "warn");
-            else SetChip("chipInstalled", "установлена версия " + installed + " · доступна " + manifest.Version, "warn");
+            if (installed == null) SetChip("chipInstalled", L.T("плагины не установлены", "plugins not installed"), "gray");
+            else if (installed == manifest.Version) SetChip("chipInstalled", L.T("установлены плагины версии ", "installed plugins version ") + installed, "blue");
+            else if (installed == L.T("вручную", "manually")) SetChip("chipInstalled", L.T("плагины поставлены вручную · доступна версия ", "plugins installed manually · available version ") + manifest.Version, "warn");
+            else SetChip("chipInstalled", L.T("установлена версия ", "installed version ") + installed + L.T(" · доступна ", " · available ") + manifest.Version, "warn");
             values.Clear();
             foreach (var c in manifest.Components)
             {
@@ -1046,7 +1072,7 @@ namespace SpeedLauncher
         void UpdateCount()
         {
             int on = plugins.Count(p => p.IsOn);
-            E<TextBlock>("pluginCount").Text = "включено " + on + " из " + plugins.Count;
+            E<TextBlock>("pluginCount").Text = L.T("включено ", "enabled ") + on + L.T(" из ", " of ") + plugins.Count;
         }
 
         // ------------------------------------------------------------ details
@@ -1063,8 +1089,8 @@ namespace SpeedLauncher
             }
             var c = p.C;
             E<TextBlock>("detTitle").Text = c.Title;
-            E<TextBlock>("detBadgeText").Text = c.Required ? "Основа: нужен остальным плагинам"
-                : c.Exact ? "Точный: расчёты игры не меняются" : "Меняет ход игры: в режиме «Только точные» не ставится";
+            E<TextBlock>("detBadgeText").Text = c.Required ? L.T("Основа: нужен остальным плагинам", "Base: needed by the other plugins")
+                : c.Exact ? L.T("Точный: расчёты игры не меняются", "Exact: the game's calculations do not change") : L.T("Меняет ход игры: в режиме «Только точные» не ставится", "Changes gameplay: not installed in “Exact only” mode");
             E<Border>("detBadge").Background = p.BadgeBg;
             E<TextBlock>("detBadgeText").Foreground = p.BadgeFg;
             E<TextBlock>("detText").Text = c.Description ?? "";
@@ -1080,15 +1106,32 @@ namespace SpeedLauncher
         bool EnsureWritable()
         {
             if (Util.CanWrite(game.Dir)) return true;
-            if (!Ask("Для записи в папку игры нужны права администратора.\nПерезапустить установщик от имени администратора?")) return false;
+            if (!Ask(L.T("Для записи в папку игры нужны права администратора.\nПерезапустить установщик от имени администратора?", "Writing to the game folder needs administrator rights.\nRestart the installer as administrator?"))) return false;
             try
             {
-                var args = "--game " + game.Game.Id + " --dir \"" + game.Dir + "\"" + (source != Config.DefaultSource ? " --source \"" + source + "\"" : "");
+                var args = "--game " + game.Game.Id + " --dir \"" + game.Dir + "\"" + (source != Config.DefaultSource ? " --source \"" + source + "\"" : "") + " --lang " + L.Code;
                 Process.Start(new ProcessStartInfo(Assembly.GetExecutingAssembly().Location, args) { Verb = "runas", UseShellExecute = true });
                 w.Close();
             }
-            catch (Exception ex) { Status("Не удалось перезапуститься: " + ex.Message, "error"); }
+            catch (Exception ex) { Status(L.T("Не удалось перезапуститься: ", "Could not restart: ") + ex.Message, "error"); }
             return false;
+        }
+
+        // Saves the other language and starts the launcher again with it (same game and folder).
+        void SwitchLanguage()
+        {
+            if (busy) return;
+            var lang = L.En ? "ru" : "en";
+            Prefs.SetDir("lang", lang);
+            var args = "--lang " + lang + (game != null ? " --game " + game.Game.Id : "") +
+                (game != null && game.Dir != null ? " --dir \"" + game.Dir + "\"" : "") +
+                (source != Config.DefaultSource ? " --source \"" + source + "\"" : "");
+            try
+            {
+                Process.Start(new ProcessStartInfo(Assembly.GetExecutingAssembly().Location, args) { UseShellExecute = true });
+                w.Close();
+            }
+            catch (Exception ex) { Status(ex.Message, "error"); }
         }
 
         async Task<byte[]> GetPackage()
@@ -1096,11 +1139,11 @@ namespace SpeedLauncher
             var id = game.Game.Id + "|" + manifest.Version;
             byte[] data;
             if (packages.TryGetValue(id, out data)) return data;
-            Status("Скачиваю плагины…", "busy");
+            Status(L.T("Скачиваю плагины…", "Downloading the plugins…"), "busy");
             data = await Read(Sibling(manifest.Package));
             if (manifest.PackageSha256 != null && !Util.Sha256(data).Equals(manifest.PackageSha256, StringComparison.OrdinalIgnoreCase))
-                throw new Exception("контрольная сумма архива не совпала — файл повреждён при загрузке. Попробуйте ещё раз.");
-            Log("Загружено " + (data.Length / 1024) + " КБ, контрольная сумма совпала.");
+                throw new Exception(L.T("контрольная сумма архива не совпала — файл повреждён при загрузке. Попробуйте ещё раз.", "the archive checksum does not match — the file was damaged while downloading. Please try again."));
+            Log(L.T("Загружено ", "Downloaded ") + (data.Length / 1024) + L.T(" КБ, контрольная сумма совпала.", " KB, checksum matches."));
             packages[id] = data;
             return data;
         }
@@ -1108,7 +1151,7 @@ namespace SpeedLauncher
         async Task Install()
         {
             if (manifest == null || !versionOk || busy) return;
-            if (Util.Running(game.Game.Process)) { Box("Закройте игру перед установкой.", MessageBoxImage.Warning); return; }
+            if (Util.Running(game.Game.Process)) { Box(L.T("Закройте игру перед установкой.", "Close the game before installing."), MessageBoxImage.Warning); return; }
             if (!EnsureWritable()) return;
             SetBusy(true);
             SetProgress(0);
@@ -1122,16 +1165,16 @@ namespace SpeedLauncher
                     Borderless = BorderlessBox.Visibility == Visibility.Visible && BorderlessBox.IsChecked == true,
                     Log = Log, Progress = SetProgress
                 };
-                Status("Устанавливаю…", "busy");
+                Status(L.T("Устанавливаю…", "Installing…"), "busy");
                 await Task.Run(() => job.Run(data));
                 SetBusy(false);
                 CheckGameDir();
-                Status("Готово: включено плагинов — " + job.Selected.Count + ". Запустите игру, потом можно нажать «Проверить работу».", "ok");
+                Status(L.T("Готово: включено плагинов — ", "Done: plugins enabled — ") + job.Selected.Count + L.T(". Запустите игру, потом можно нажать «Проверить работу».", ". Start the game, then you can press “Check”."), "ok");
             }
             catch (Exception ex)
             {
                 SetBusy(false);
-                Status("Установка не удалась: " + ex.Message, "error");
+                Status(L.T("Установка не удалась: ", "Installation failed: ") + ex.Message, "error");
                 ToggleLog(true);
             }
             finally { SetProgress(-1); }
@@ -1141,16 +1184,16 @@ namespace SpeedLauncher
         void Uninstall()
         {
             if (manifest == null || game.Dir == null || busy) return;
-            if (Util.Running(game.Game.Process)) { Box("Закройте игру.", MessageBoxImage.Warning); return; }
-            if (!Ask("Удалить все плагины этого установщика из папки " + game.Name + "?\nСохранения и сама игра не затрагиваются.")) return;
+            if (Util.Running(game.Game.Process)) { Box(L.T("Закройте игру.", "Close the game."), MessageBoxImage.Warning); return; }
+            if (!Ask(L.T("Удалить все плагины этого установщика из папки ", "Remove all plugins of this installer from the folder of ") + game.Name + L.T("?\nСохранения и сама игра не затрагиваются.", "?\nSaves and the game itself are not touched."))) return;
             if (!EnsureWritable()) return;
             try
             {
                 int removed = new InstallJob { Dir = game.Dir, M = manifest, Log = Log }.Uninstall();
                 CheckGameDir();
-                Status("Удалено файлов: " + removed + ". Игра снова обычная.", "ok");
+                Status(L.T("Удалено файлов: ", "Files removed: ") + removed + L.T(". Игра снова обычная.", ". The game is back to normal."), "ok");
             }
-            catch (Exception ex) { Status("Ошибка удаления: " + ex.Message, "error"); ToggleLog(true); }
+            catch (Exception ex) { Status(L.T("Ошибка удаления: ", "Removal failed: ") + ex.Message, "error"); ToggleLog(true); }
         }
 
         void Play()
@@ -1159,22 +1202,22 @@ namespace SpeedLauncher
             {
                 bool steam = build == "Steam" ||
                     (build == null && game.Dir.IndexOf(@"\steamapps\", StringComparison.OrdinalIgnoreCase) >= 0);
-                if (steam) { Process.Start("steam://rungameid/" + game.Game.AppId); Status("Запускаю " + game.Name + " через Steam…", "info"); }
+                if (steam) { Process.Start("steam://rungameid/" + game.Game.AppId); Status(L.T("Запускаю ", "Starting ") + game.Name + L.T(" через Steam…", " through Steam…"), "info"); }
                 else
                 {
                     var exe = Util.Local(game.Dir, game.Game.Exe);
                     Process.Start(new ProcessStartInfo(exe) { WorkingDirectory = Path.GetDirectoryName(exe), UseShellExecute = true });
-                    Status("Запускаю " + game.Name + "…", "info");
+                    Status(L.T("Запускаю ", "Starting ") + game.Name + "…", "info");
                 }
             }
-            catch (Exception ex) { Status("Не удалось запустить: " + ex.Message, "error"); }
+            catch (Exception ex) { Status(L.T("Не удалось запустить: ", "Could not start: ") + ex.Message, "error"); }
         }
 
         // ------------------------------------------------------------ status check
         void CheckStatus(bool showLog)
         {
             if (manifest == null || game.Dir == null) return;
-            Log("Проверка по журналам последнего запуска игры:");
+            Log(L.T("Проверка по журналам последнего запуска игры:", "Check from the logs of the last game start:"));
             int ok = 0, total = 0, notRun = 0, bad = 0;
             foreach (var c in manifest.Components)
             {
@@ -1183,13 +1226,13 @@ namespace SpeedLauncher
                 total++;
                 var verdict = InstallJob.Verdict(Util.Local(game.Dir, dll.Substring(0, dll.Length - 4) + ".log"));
                 if (verdict == "OK") ok++;
-                else if (verdict.StartsWith("не запускался")) notRun++;
-                else if (verdict.StartsWith("ОТКАЗ") || verdict.StartsWith("OK, частично")) bad++;
+                else if (verdict.StartsWith(L.T("не запускался", "not run"))) notRun++;
+                else if (verdict.StartsWith(L.T("ОТКАЗ", "REFUSED")) || verdict.StartsWith(L.T("OK, частично", "OK, partly"))) bad++;
                 Log("  " + c.Title + ": " + verdict);
             }
-            if (notRun == total && total > 0) Status("Игра ещё не запускалась с плагинами. Запустите её и проверьте снова.", "info");
-            else if (ok == total) Status("Работают все плагины: " + ok + " из " + total + ".", "ok");
-            else Status("Работают " + ok + " из " + total + " плагинов — подробности в журнале.", bad > 0 ? "warn" : "info");
+            if (notRun == total && total > 0) Status(L.T("Игра ещё не запускалась с плагинами. Запустите её и проверьте снова.", "The game has not run with the plugins yet. Start it and check again."), "info");
+            else if (ok == total) Status(L.T("Работают все плагины: ", "All plugins work: ") + ok + L.T(" из ", " of ") + total + ".", "ok");
+            else Status(L.T("Работают ", "Working: ") + ok + L.T(" из ", " of ") + total + L.T(" плагинов — подробности в журнале.", " plugins — details in the log."), bad > 0 ? "warn" : "info");
             if (showLog && ok != total) ToggleLog(true);
         }
 
@@ -1226,7 +1269,7 @@ namespace SpeedLauncher
                     using (var f = File.Create(Path.Combine(outDir, name))) enc.Save(f);
                 }
             }
-            catch (Exception ex) { Log("ОШИБКА: " + ex); }
+            catch (Exception ex) { Log(L.T("ОШИБКА: ", "ERROR: ") + ex); }
             try { File.WriteAllText(Path.Combine(outDir, "launcher_auto.log"), LogBox.Text, Encoding.UTF8); } catch { }
             w.Close();
         }
@@ -1273,13 +1316,13 @@ namespace SpeedLauncher
                         if (on)
                         {
                             var entry = zip.GetEntry(rel);
-                            if (entry == null) throw new Exception("в архиве нет файла " + rel);
+                            if (entry == null) throw new Exception(L.T("в архиве нет файла ", "the archive has no file ") + rel);
                             byte[] bytes;
                             using (var s = entry.Open())
                             using (var ms = new MemoryStream()) { s.CopyTo(ms); bytes = ms.ToArray(); }
                             string expected;
                             if (M.FileSha256.TryGetValue(rel, out expected) && !Util.Sha256(bytes).Equals(expected, StringComparison.OrdinalIgnoreCase))
-                                throw new Exception("контрольная сумма файла " + rel + " не совпала");
+                                throw new Exception(L.T("контрольная сумма файла ", "checksum of the file ") + rel + L.T(" не совпала", " does not match"));
                             BackupForeign(rel, path, bytes);
                             Directory.CreateDirectory(Path.GetDirectoryName(path));
                             File.WriteAllBytes(path, bytes);
@@ -1288,7 +1331,7 @@ namespace SpeedLauncher
                         else if (File.Exists(path) && IsOurs(rel, path))
                         {
                             File.Delete(path);
-                            Log("Удалён: " + rel);
+                            Log(L.T("Удалён: ", "Removed: ") + rel);
                         }
                     }
                     if (on && c.Ini != null)
@@ -1299,7 +1342,7 @@ namespace SpeedLauncher
                         foreach (var s in c.Settings) ini.Set(s.Section, s.Key, Values[Key(c, s)]);
                         ini.Save();
                     }
-                    if (on) Log("Установлен: " + c.Title);
+                    if (on) Log(L.T("Установлен: ", "Installed: ") + c.Title);
                     Progress(++done * 100.0 / M.Components.Count);
                 }
             }
@@ -1322,7 +1365,7 @@ namespace SpeedLauncher
             var target = Path.Combine(backup, Path.GetFileName(path));
             if (File.Exists(target)) target = Path.Combine(backup, Path.GetFileNameWithoutExtension(path) + "_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".dll");
             File.Copy(path, target);
-            Log("Чужой " + rel + " сохранён в " + Config.BackupDir + " (вернётся при удалении).");
+            Log(L.T("Чужой ", "Another ") + rel + L.T(" сохранён в ", " saved to ") + Config.BackupDir + L.T(" (вернётся при удалении).", " (it comes back on removal)."));
         }
 
         void RestoreBackups()
@@ -1336,7 +1379,7 @@ namespace SpeedLauncher
                 if (!File.Exists(live) && !Regex.IsMatch(name, @"_\d{8}_\d{6}\.dll$"))
                 {
                     File.Move(saved, live);
-                    Log("Возвращён ваш прежний " + name + ".");
+                    Log(L.T("Возвращён ваш прежний ", "Restored your previous ") + name + ".");
                 }
             }
         }
@@ -1347,15 +1390,15 @@ namespace SpeedLauncher
             {
                 var b = M.Borderless;
                 var file = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), b.File.Replace('/', '\\'));
-                if (!File.Exists(file)) { Log("Файл настроек игры не найден — режим экрана поменяйте в настройках игры."); return; }
+                if (!File.Exists(file)) { Log(L.T("Файл настроек игры не найден — режим экрана поменяйте в настройках игры.", "The game's settings file was not found — change the screen mode in the game's settings.")); return; }
                 var text = File.ReadAllText(file);
                 var updated = Regex.Replace(text, b.Pattern, b.Replace);
-                if (updated == text) { Log("Режим экрана уже «без рамки»."); return; }
+                if (updated == text) { Log(L.T("Режим экрана уже «без рамки».", "The screen mode is already borderless.")); return; }
                 File.Copy(file, file + ".bak_launcher", true);
                 File.WriteAllText(file, updated);
-                Log("Режим экрана переключён на «без рамки» (копия настроек: " + Path.GetFileName(file) + ".bak_launcher).");
+                Log(L.T("Режим экрана переключён на «без рамки» (копия настроек: ", "Screen mode switched to borderless (settings backup: ") + Path.GetFileName(file) + ".bak_launcher).");
             }
-            catch (Exception ex) { Log("Не удалось поменять режим экрана: " + ex.Message); }
+            catch (Exception ex) { Log(L.T("Не удалось поменять режим экрана: ", "Could not change the screen mode: ") + ex.Message); }
         }
 
         public int Uninstall()
@@ -1389,13 +1432,13 @@ namespace SpeedLauncher
             RestoreBackups();
             var backup = Path.Combine(Dir, Config.BackupDir);
             if (Directory.Exists(backup) && Directory.GetFileSystemEntries(backup).Length == 0) Directory.Delete(backup);
-            Log("Удалено файлов: " + removed + ".");
+            Log(L.T("Удалено файлов: ", "Files removed: ") + removed + ".");
             return removed;
         }
 
         public static string Verdict(string logPath)
         {
-            if (!File.Exists(logPath)) return "не запускался (игру ещё не запускали после установки)";
+            if (!File.Exists(logPath)) return L.T("не запускался (игру ещё не запускали после установки)", "not run (the game has not been started since installing)");
             string[] lines;
             try
             {
@@ -1403,16 +1446,16 @@ namespace SpeedLauncher
                 using (var sr = new StreamReader(fs, Encoding.UTF8))
                     lines = sr.ReadToEnd().Split('\n');
             }
-            catch (Exception ex) { return "не удалось прочитать журнал: " + ex.Message; }
+            catch (Exception ex) { return L.T("не удалось прочитать журнал: ", "could not read the log: ") + ex.Message; }
             int init = -1;
             for (int i = lines.Length - 1; i >= 0; i--)
                 if (lines[i].Contains("initialized") || lines[i].Contains(" installed") || lines[i].Contains("disabled by configuration")) { init = i; break; }
-            if (init < 0) return lines.Any(l => l.Contains("REFUSED")) ? "ОТКАЗ (не та версия игры?)" : "нет данных";
+            if (init < 0) return lines.Any(l => l.Contains("REFUSED")) ? L.T("ОТКАЗ (не та версия игры?)", "REFUSED (wrong game version?)") : L.T("нет данных", "no data");
             var pid = Regex.Match(lines[init], @"^\[(\d+):").Groups[1].Value;
             Func<string, bool> same = l => pid != "" && l.StartsWith("[" + pid + ":");
             bool active = lines.Any(l => same(l) && (l.Contains("initialized") || l.Contains(" installed")));
-            if (!active) return "выключен в настройках";
-            if (lines.Any(l => same(l) && l.Contains("REFUSED"))) return "OK, частично (часть функций отключилась, см. " + Path.GetFileName(logPath) + ")";
+            if (!active) return L.T("выключен в настройках", "turned off in the settings");
+            if (lines.Any(l => same(l) && l.Contains("REFUSED"))) return L.T("OK, частично (часть функций отключилась, см. ", "OK, partly (some features turned off, see ") + Path.GetFileName(logPath) + ")";
             return "OK";
         }
     }
@@ -1421,22 +1464,59 @@ namespace SpeedLauncher
     {
         public static string Auto;
 
+        // The window's texts in English (MainWindow.xaml is written in Russian).
+        static readonly Dictionary<string, string> XamlEnglish = new Dictionary<string, string>
+        {
+            { "Ускорение игр Paradox", "Paradox games speed-up" },
+            { "Ускорение", "Speed-up" },
+            { "плагины для игр Paradox", "plugins for Paradox games" },
+            { "ИГРЫ", "GAMES" },
+            { "Изменить…", "Change…" },
+            { "Открыть папку", "Open folder" },
+            { "Все плагины", "All plugins" },
+            { "Максимальная скорость. Партия может идти немного иначе, чем в обычной игре.", "Maximum speed. A campaign may go slightly differently than in the normal game." },
+            { "Только точные", "Exact only" },
+            { "Расчёты игры такие же, как без плагинов. Ускорение чуть меньше.", "The game calculates exactly as without plugins. A bit less speed-up." },
+            { "Выборочно", "Custom" },
+            { "Включить нужные плагины и поменять их настройки самому.", "Choose the plugins and change their settings yourself." },
+            { "Плагины", "Plugins" },
+            { "НАСТРОЙКИ", "SETTINGS" },
+            { "У этого плагина нет настроек.", "This plugin has no settings." },
+            { "Показать журнал", "Show log" },
+            { "Удалить", "Remove" },
+            { "Проверить работу", "Check" },
+            { "Играть", "Play" },
+            { "Установить", "Install" },
+        };
+
         [STAThread]
         static void Main(string[] args)
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | (SecurityProtocolType)12288; // TLS 1.2 + 1.3
-            string source = Config.DefaultSource, dir = null, gameId = null;
+            string source = Config.DefaultSource, dir = null, gameId = null, lang = null;
             for (int i = 0; i + 1 < args.Length; i++)
             {
                 if (args[i] == "--source") source = args[++i];
                 else if (args[i] == "--dir") dir = args[++i];
                 else if (args[i] == "--game") gameId = args[++i];
                 else if (args[i] == "--auto") Auto = args[++i];
+                else if (args[i] == "--lang") lang = args[++i];
             }
+            L.Choose(lang);
             var app = new Application { ShutdownMode = ShutdownMode.OnMainWindowClose };
             Window window;
+            string xaml;
             using (var s = Assembly.GetExecutingAssembly().GetManifestResourceStream("MainWindow.xaml"))
-                window = (Window)XamlReader.Load(s);
+            using (var r = new StreamReader(s, Encoding.UTF8))
+                xaml = r.ReadToEnd();
+            if (L.En)
+                foreach (var kv in XamlEnglish)
+                {
+                    var from = "\"" + kv.Key + "\"";
+                    if (!xaml.Contains(from)) throw new Exception("MainWindow.xaml has no " + from);
+                    xaml = xaml.Replace(from, "\"" + kv.Value + "\"");
+                }
+            window = (Window)XamlReader.Parse(xaml);
             using (var s = Assembly.GetExecutingAssembly().GetManifestResourceStream("app.ico"))
                 if (s != null) window.Icon = BitmapFrame.Create(s, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
             new Launcher(window, source, gameId, dir);

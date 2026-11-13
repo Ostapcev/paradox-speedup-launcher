@@ -23,7 +23,9 @@
     "plugins/LICENSE.bellows.txt",
     "plugins/LICENSE.hamweard.txt"
    ],
-   "description": "Нужен всегда. Игра при запуске сама загружает VERSION.dll, а он загружает все плагины из папки plugins. Взят из открытого проекта EU4 Unicode Patch (лицензия MIT).\r\n\r\nЕсли у вас уже стоит другой VERSION.dll (например старый патч шрифтов), установщик сохранит его в папку eu4_launcher_backup и вернёт при удалении."
+   "description": "Нужен всегда. Игра при запуске сама загружает VERSION.dll, а он загружает все плагины из папки plugins. Взят из открытого проекта EU4 Unicode Patch (лицензия MIT).\r\n\r\nЕсли у вас уже стоит другой VERSION.dll (например старый патч шрифтов), установщик сохранит его в папку eu4_launcher_backup и вернёт при удалении.",
+   "title_en": "Plugin loader (VERSION.dll)",
+   "description_en": "Always needed. The game loads VERSION.dll at start-up, and it loads every plugin from the plugins folder. Taken from the open-source EU4 Unicode Patch (MIT licence).\r\n\r\nIf you already have another VERSION.dll (an old font patch, for example), the installer keeps it in the eu4_launcher_backup folder and puts it back when you remove the plugins."
   },
   {
    "id": "dxvk",
@@ -34,7 +36,9 @@
     "d3d9.dll",
     "DXVK.LICENSE.txt"
    ],
-   "description": "Заменяет графическую часть игры (DirectX 9) на Vulkan. Часть работы видеодрайвера уходит с главного потока игры. Сам по себе даёт немного, около 3%.\r\n\r\nНа расчёты игры не влияет.\r\n\r\nНужна видеокарта со свежим драйвером Vulkan 1.3. Работает только в режиме экрана «без рамки» (Borderless fullscreen): в эксклюзивном полноэкранном режиме игра с DXVK у нас вылетала. Установщик может сам переключить режим экрана (галочка внизу).\r\n\r\nОткрытый проект DXVK 3.1.1, лицензия zlib."
+   "description": "Заменяет графическую часть игры (DirectX 9) на Vulkan. Часть работы видеодрайвера уходит с главного потока игры. Сам по себе даёт немного, около 3%.\r\n\r\nНа расчёты игры не влияет.\r\n\r\nНужна видеокарта со свежим драйвером Vulkan 1.3. Работает только в режиме экрана «без рамки» (Borderless fullscreen): в эксклюзивном полноэкранном режиме игра с DXVK у нас вылетала. Установщик может сам переключить режим экрана (галочка внизу).\r\n\r\nНа ноутбуке с двумя видеокартами проверьте, что игра работает на дискретной (Параметры Windows → Дисплей → Графика → eu4.exe → «Высокая производительность»).\r\n\r\nОткрытый проект DXVK 3.1.1, лицензия zlib.",
+   "title_en": "DXVK — graphics through Vulkan (d3d9.dll)",
+   "description_en": "Replaces the game's graphics layer (DirectX 9) with Vulkan. Part of the video driver's work moves off the game's main thread. On its own it gives little, about 3%.\r\n\r\nDoes not affect the game's calculations.\r\n\r\nNeeds a graphics card with a recent Vulkan 1.3 driver. Works only in borderless fullscreen: in exclusive fullscreen the game crashed with DXVK in our tests. The installer can switch the screen mode for you (the checkbox at the bottom).\r\n\r\nOn a laptop with two graphics cards, make sure the game runs on the discrete one (Windows Settings → Display → Graphics → eu4.exe → High performance).\r\n\r\nOpen-source DXVK 3.1.1, zlib licence."
   },
   {
    "id": "render",
@@ -54,26 +58,33 @@
      "choices": [
       [
        "0.1",
-       "10 — быстрее всего, но заметно дёргано"
+       "10 — быстрее всего, но заметно дёргано",
+       "10 — fastest, but visibly choppy"
       ],
       [
        "0.05",
+       "20",
        "20"
       ],
       [
        "0.0333333",
-       "30 (рекомендуется)"
+       "30 (рекомендуется)",
+       "30 (recommended)"
       ],
       [
        "0.0166667",
-       "60 — плавно, ускорение меньше"
+       "60 — плавно, ускорение меньше",
+       "60 — smooth, smaller speed-up"
       ],
       [
        "0",
-       "Без ограничения (как в обычной игре)"
+       "Без ограничения (как в обычной игре)",
+       "No limit (as in the normal game)"
       ]
      ],
-     "help": "Меньше кадров — быстрее идут дни, но картинка дёрганее."
+     "help": "Меньше кадров — быстрее идут дни, но картинка дёрганее.",
+     "label_en": "Frames per second at fast speeds",
+     "help_en": "Fewer frames: days pass faster, but the picture is choppier."
     },
     {
      "section": "render",
@@ -83,18 +94,23 @@
      "choices": [
       [
        "0.1",
-       "Часто (плавнее, медленнее)"
+       "Часто (плавнее, медленнее)",
+       "Often (smoother, slower)"
       ],
       [
        "0.5",
-       "Раз в полсекунды (рекомендуется)"
+       "Раз в полсекунды (рекомендуется)",
+       "Every half second (recommended)"
       ],
       [
        "2",
-       "Редко (быстрее)"
+       "Редко (быстрее)",
+       "Rarely (faster)"
       ]
      ],
-     "help": "В начале месяца игра долго считает. Это — как часто в это время обновлять картинку."
+     "help": "В начале месяца игра долго считает. Это — как часто в это время обновлять картинку.",
+     "label_en": "Picture updates during the start of the month",
+     "help_en": "At the start of the month the game calculates for a long time. This is how often to update the picture meanwhile."
     },
     {
      "section": "render",
@@ -104,14 +120,18 @@
      "choices": [
       [
        "1",
-       "Да (рекомендуется)"
+       "Да (рекомендуется)",
+       "Yes (recommended)"
       ],
       [
        "0",
-       "Нет"
+       "Нет",
+       "No"
       ]
      ],
-     "help": "Здания, модели и юниты на карте обновляются только на нарисованных кадрах."
+     "help": "Здания, модели и юниты на карте обновляются только на нарисованных кадрах.",
+     "label_en": "Do not update map objects on skipped frames",
+     "help_en": "Buildings, models and units on the map update only on drawn frames."
     },
     {
      "section": "render",
@@ -121,14 +141,18 @@
      "choices": [
       [
        "0.5",
-       "Перепроверять 2 раза в секунду (рекомендуется)"
+       "Перепроверять 2 раза в секунду (рекомендуется)",
+       "Recheck twice a second (recommended)"
       ],
       [
        "0",
-       "Как в игре (на каждом кадре)"
+       "Как в игре (на каждом кадре)",
+       "As in the game (every frame)"
       ]
      ],
-     "help": "Для игры за страну. Предупреждение может исчезать с задержкой до полсекунды."
+     "help": "Для игры за страну. Предупреждение может исчезать с задержкой до полсекунды.",
+     "label_en": "Top-bar alerts",
+     "help_en": "When playing a country. An alert may disappear up to half a second late."
     },
     {
      "section": "render",
@@ -138,14 +162,18 @@
      "choices": [
       [
        "0.5",
-       "Обновлять 2 раза в секунду (рекомендуется)"
+       "Обновлять 2 раза в секунду (рекомендуется)",
+       "Update twice a second (recommended)"
       ],
       [
        "0",
-       "Как в игре (на каждом кадре)"
+       "Как в игре (на каждом кадре)",
+       "As in the game (every frame)"
       ]
      ],
-     "help": "Числа на значках (цены, осады) меняются с задержкой до полсекунды."
+     "help": "Числа на значках (цены, осады) меняются с задержкой до полсекунды.",
+     "label_en": "Icons over provinces",
+     "help_en": "Numbers on icons (prices, sieges) change up to half a second late."
     },
     {
      "section": "render",
@@ -155,16 +183,22 @@
      "choices": [
       [
        "0",
-       "Выключено (рекомендуется)"
+       "Выключено (рекомендуется)",
+       "Off (recommended)"
       ],
       [
        "0.05",
-       "Не больше 20 кадров/с"
+       "Не больше 20 кадров/с",
+       "At most 20 frames/s"
       ]
      ],
-     "help": "Для очень тяжёлых модов. На практике давало рваную картинку — лучше не включать."
+     "help": "Для очень тяжёлых модов. На практике давало рваную картинку — лучше не включать.",
+     "label_en": "Extra frame limit while the game runs",
+     "help_en": "For very heavy mods. In practice it gave a jerky picture — better leave it off."
     }
-   ]
+   ],
+   "title_en": "Draw fewer frames at fast speeds",
+   "description_en": "The largest speed-up (about 10%). While game days pass quickly, the game spends much of its main thread drawing frames. The plugin draws them less often. When paused and at slow speeds frames are drawn as usual.\r\n\r\nDoes not affect the game's calculations: only how often the picture is updated changes.\r\n\r\nIn game you can change the rate with the console command fps_render N (for example fps_render 60)."
   },
   {
    "id": "alloc",
@@ -184,14 +218,17 @@
      "choices": [
       [
        "32768",
-       "32768 байт (быстрее, рекомендуется при 16 ГБ и больше)"
+       "32768 байт (быстрее, рекомендуется при 16 ГБ и больше)",
+       "32768 bytes (faster, recommended with 16 GB or more)"
       ],
       [
        "2048",
-       "2048 байт (экономнее по памяти, для 8 ГБ)"
+       "2048 байт (экономнее по памяти, для 8 ГБ)",
+       "2048 bytes (uses less memory, for 8 GB)"
       ]
      ],
-     "help": ""
+     "help": "",
+     "label_en": "Largest block the plugin hands out"
     },
     {
      "section": "alloc",
@@ -201,16 +238,22 @@
      "choices": [
       [
        "1",
-       "Да (рекомендуется)"
+       "Да (рекомендуется)",
+       "Yes (recommended)"
       ],
       [
        "0",
-       "Нет"
+       "Нет",
+       "No"
       ]
      ],
-     "help": "Убирает лишние переходы при выделении памяти."
+     "help": "Убирает лишние переходы при выделении памяти.",
+     "label_en": "Hook the game's new/delete directly",
+     "help_en": "Removes extra jumps when allocating memory."
     }
-   ]
+   ],
+   "title_en": "Fast memory allocation",
+   "description_en": "Replaces the game's memory allocator with a faster one. The second-largest speed-up (about 8%).\r\n\r\nCHANGES HOW THE GAME PLAYS OUT: objects end up at other memory addresses, and in places the game depends on the order of addresses. A campaign goes slightly differently than without the plugin (just as two ordinary campaigns from the same save also diverge). In Anbennar this once caused a crash; the \"Crash guard\" setting of the \"Country calculations ahead of time\" plugin protects against it.\r\n\r\nThe game uses more memory (1–1.5 GB more for us). With 8 GB of RAM choose a block size of 2048."
   },
   {
    "id": "country",
@@ -230,18 +273,23 @@
      "choices": [
       [
        "auto",
-       "Сами по числу физических ядер (рекомендуется)"
+       "Сами по числу физических ядер (рекомендуется)",
+       "Automatic, by physical cores (recommended)"
       ],
       [
+       "2",
        "2",
        "2"
       ],
       [
        "1",
+       "1",
        "1"
       ]
      ],
-     "help": "«Сами»: 4 ядра и меньше — 1 поток, 6 ядер — 2, 8 и больше — 4. Игре нужны свободные ядра для своих расчётов ИИ, а ноутбук при полной загрузке снижает частоту, поэтому на слабом процессоре больше потоков не значит быстрее."
+     "help": "«Сами»: 4 ядра и меньше — 1 поток, 6 ядер — 2, 8 и больше — 4. Игре нужны свободные ядра для своих расчётов ИИ, а ноутбук при полной загрузке снижает частоту, поэтому на слабом процессоре больше потоков не значит быстрее.",
+     "label_en": "How many extra cores to use",
+     "help_en": "Automatic: 4 cores or fewer — 1 thread, 6 cores — 2, 8 and more — 4. The game needs free cores for its own AI, and a laptop lowers its clock under full load, so on a weak CPU more threads do not mean faster."
     },
     {
      "section": "country",
@@ -252,14 +300,18 @@
      "choices": [
       [
        "on",
-       "Включено"
+       "Включено",
+       "On"
       ],
       [
        "off",
-       "Выключено"
+       "Выключено",
+       "Off"
       ]
      ],
-     "help": "0 расхождений с игрой на 22 млн сравнений."
+     "help": "0 расхождений с игрой на 22 млн сравнений.",
+     "label_en": "Colonial range",
+     "help_en": "0 differences from the game in 22 million comparisons."
     },
     {
      "section": "country",
@@ -269,14 +321,18 @@
      "choices": [
       [
        "on",
-       "Включено"
+       "Включено",
+       "On"
       ],
       [
        "off",
-       "Выключено"
+       "Выключено",
+       "Off"
       ]
      ],
-     "help": "0 расхождений на 5,7 млн сравнений."
+     "help": "0 расхождений на 5,7 млн сравнений.",
+     "label_en": "Casus belli",
+     "help_en": "0 differences in 5.7 million comparisons."
     },
     {
      "section": "country",
@@ -286,14 +342,18 @@
      "choices": [
       [
        "on",
-       "Включено"
+       "Включено",
+       "On"
       ],
       [
        "off",
-       "Выключено"
+       "Выключено",
+       "Off"
       ]
      ],
-     "help": "0 расхождений на 2,5 млн сравнений."
+     "help": "0 расхождений на 2,5 млн сравнений.",
+     "label_en": "Province history (cores, claims)",
+     "help_en": "0 differences in 2.5 million comparisons."
     },
     {
      "section": "country",
@@ -304,14 +364,18 @@
      "choices": [
       [
        "on",
-       "Включено"
+       "Включено",
+       "On"
       ],
       [
        "off",
-       "Выключено"
+       "Выключено",
+       "Off"
       ]
      ],
-     "help": "Редкие расхождения: 7 на 434 млн сравнений."
+     "help": "Редкие расхождения: 7 на 434 млн сравнений.",
+     "label_en": "Estates (whether they can appear)",
+     "help_en": "Rare differences: 7 in 434 million comparisons."
     },
     {
      "section": "country",
@@ -322,14 +386,18 @@
      "choices": [
       [
        "on",
-       "Включено"
+       "Включено",
+       "On"
       ],
       [
        "off",
-       "Выключено"
+       "Выключено",
+       "Off"
       ]
      ],
-     "help": "Редкие расхождения: 41 на 26 млн сравнений."
+     "help": "Редкие расхождения: 41 на 26 млн сравнений.",
+     "label_en": "Army and navy strength",
+     "help_en": "Rare differences: 41 in 26 million comparisons."
     },
     {
      "section": "country",
@@ -340,14 +408,18 @@
      "choices": [
       [
        "on",
-       "Включено"
+       "Включено",
+       "On"
       ],
       [
        "off",
-       "Выключено"
+       "Выключено",
+       "Off"
       ]
      ],
-     "help": "Редкие расхождения: 2 на 64 млн сравнений."
+     "help": "Редкие расхождения: 2 на 64 млн сравнений.",
+     "label_en": "Government reforms",
+     "help_en": "Rare differences: 2 in 64 million comparisons."
     },
     {
      "section": "country",
@@ -358,14 +430,18 @@
      "choices": [
       [
        "on",
-       "Включено"
+       "Включено",
+       "On"
       ],
       [
        "off",
-       "Выключено"
+       "Выключено",
+       "Off"
       ]
      ],
-     "help": "Редкие расхождения: 17 на 203 млн сравнений."
+     "help": "Редкие расхождения: 17 на 203 млн сравнений.",
+     "label_en": "Mercenaries",
+     "help_en": "Rare differences: 17 in 203 million comparisons."
     },
     {
      "section": "country",
@@ -375,14 +451,18 @@
      "choices": [
       [
        "on",
-       "Включено"
+       "Включено",
+       "On"
       ],
       [
        "off",
-       "Выключено"
+       "Выключено",
+       "Off"
       ]
      ],
-     "help": "Только чтение памяти заранее, логику не меняет."
+     "help": "Только чтение памяти заранее, логику не меняет.",
+     "label_en": "Prefetch relation data into the cache",
+     "help_en": "Only reads memory ahead of time; does not change the logic."
     },
     {
      "section": "country",
@@ -392,14 +472,18 @@
      "choices": [
       [
        "on",
-       "Включено"
+       "Включено",
+       "On"
       ],
       [
        "off",
-       "Выключено"
+       "Выключено",
+       "Off"
       ]
      ],
-     "help": "Только чтение памяти заранее, логику не меняет."
+     "help": "Только чтение памяти заранее, логику не меняет.",
+     "label_en": "Prefetch province data into the cache",
+     "help_en": "Only reads memory ahead of time; does not change the logic."
     },
     {
      "section": "country",
@@ -409,16 +493,22 @@
      "choices": [
       [
        "on",
-       "Включено (рекомендуется)"
+       "Включено (рекомендуется)",
+       "On (recommended)"
       ],
       [
        "off",
-       "Выключено"
+       "Выключено",
+       "Off"
       ]
      ],
-     "help": "Игра в редком случае сама обращается к пустому указателю и вылетает. Защита пропускает такой вызов."
+     "help": "Игра в редком случае сама обращается к пустому указателю и вылетает. Защита пропускает такой вызов.",
+     "label_en": "Crash guard (diplomatic relations)",
+     "help_en": "In a rare case the game itself reads a null pointer and crashes. The guard skips such a call."
     }
-   ]
+   ],
+   "title_en": "Country calculations ahead of time, on several threads",
+   "description_en": "Part of the daily and monthly country calculations is done ahead of time, in parallel on other CPU cores, and the game then takes the ready answer. Speeds up the start of the month most (together with the other plugins about 15% of the monthly tick).\r\n\r\nEvery setting was checked by comparison with the game. For four calculations (estates, army strength, reforms, mercenaries) a long Anbennar test found very rare differences — from 1 in a million to 1 in 60 million checks. In \"Exact only\" mode they are turned off."
   },
   {
    "id": "ai",
@@ -438,14 +528,17 @@
      "choices": [
       [
        "on",
-       "Включено"
+       "Включено",
+       "On"
       ],
       [
        "off",
-       "Выключено"
+       "Выключено",
+       "Off"
       ]
      ],
-     "help": ""
+     "help": "",
+     "label_en": "Army target search"
     },
     {
      "section": "ai",
@@ -455,14 +548,17 @@
      "choices": [
       [
        "on",
-       "Включено"
+       "Включено",
+       "On"
       ],
       [
        "off",
-       "Выключено"
+       "Выключено",
+       "Off"
       ]
      ],
-     "help": ""
+     "help": "",
+     "label_en": "Unit properties"
     },
     {
      "section": "ai",
@@ -472,14 +568,17 @@
      "choices": [
       [
        "on",
-       "Включено"
+       "Включено",
+       "On"
       ],
       [
        "off",
-       "Выключено"
+       "Выключено",
+       "Off"
       ]
      ],
-     "help": ""
+     "help": "",
+     "label_en": "Country scores"
     },
     {
      "section": "ai",
@@ -489,14 +588,17 @@
      "choices": [
       [
        "on",
-       "Включено"
+       "Включено",
+       "On"
       ],
       [
        "off",
-       "Выключено"
+       "Выключено",
+       "Off"
       ]
      ],
-     "help": ""
+     "help": "",
+     "label_en": "Province scores for armies"
     }
    ],
    "fixed": [
@@ -510,7 +612,9 @@
      "sample_heavy",
      "0"
     ]
-   ]
+   ],
+   "title_en": "Faster AI calculations",
+   "description_en": "Remembers intermediate AI calculations within one day: army target searches, province scores and so on. When the same data is needed again, the answer comes from memory. The AI makes the same decisions: 0 differences in hundreds of millions of checks.\r\n\r\nPartly based on the open-source Bellows project (MIT)."
   },
   {
    "id": "knowledge",
@@ -530,14 +634,18 @@
      "choices": [
       [
        "efficient",
-       "Экономное (рекомендуется)"
+       "Экономное (рекомендуется)",
+       "Efficient (recommended)"
       ],
       [
        "disabled",
-       "Как в игре"
+       "Как в игре",
+       "As in the game"
       ]
      ],
-     "help": "Потоки игры меньше крутятся вхолостую, пока ждут работу."
+     "help": "Потоки игры меньше крутятся вхолостую, пока ждут работу.",
+     "label_en": "Waiting of the game's worker threads",
+     "help_en": "The game's threads spin idle less while waiting for work."
     }
    ],
    "fixed": [
@@ -546,7 +654,9 @@
      "mode",
      "parallel"
     ]
-   ]
+   ],
+   "title_en": "Parallel map knowledge",
+   "description_en": "Every day each country recalculates which countries and provinces it knows. The plugin does this work in parallel on several cores and applies the result in the same order as the game. Doubtful cases go back to the game. 0 differences in 737 million checks."
   },
   {
    "id": "modifier",
@@ -566,14 +676,17 @@
      "choices": [
       [
        "on",
-       "Включено"
+       "Включено",
+       "On"
       ],
       [
        "off",
-       "Выключено"
+       "Выключено",
+       "Off"
       ]
      ],
-     "help": ""
+     "help": "",
+     "label_en": "Fast merging of modifier lists"
     }
    ],
    "fixed": [
@@ -582,7 +695,9 @@
      "mode",
      "optimize"
     ]
-   ]
+   ],
+   "title_en": "Fast modifier search and merge",
+   "description_en": "The game looks up and adds up modifiers (country and province bonuses and penalties) very often. The plugin does it faster with the same result: search with SSE2 instructions, merging without extra passes (0 differences in 11 million comparisons).\r\n\r\nThe merge is partly based on the Bellows project (MIT)."
   },
   {
    "id": "gov",
@@ -599,7 +714,9 @@
      "attr_cache",
      "on"
     ]
-   ]
+   ],
+   "title_en": "Remember government reform properties",
+   "description_en": "The game checks billions of times whether a country's government has a given reform property. The plugin remembers the answers. 0 differences in 2.8 billion checks."
   },
   {
    "id": "pops",
@@ -616,7 +733,9 @@
      "poll_sleep",
      "zero"
     ]
-   ]
+   ],
+   "title_en": "No needless waiting in Paradox online services",
+   "description_en": "The Paradox online services library sleeps for 1 ms on every frame. The plugin removes this wait. Your account and online features work as usual. Does not affect the game's calculations."
   },
   {
    "id": "load",
@@ -636,14 +755,18 @@
      "choices": [
       [
        "on",
-       "Включено"
+       "Включено",
+       "On"
       ],
       [
        "off",
-       "Выключено"
+       "Выключено",
+       "Off"
       ]
      ],
-     "help": "Самая заметная часть ускорения загрузки."
+     "help": "Самая заметная часть ускорения загрузки.",
+     "label_en": "Read game files into memory ahead of time",
+     "help_en": "The most noticeable part of the loading speed-up."
     },
     {
      "section": "load",
@@ -653,18 +776,22 @@
      "choices": [
       [
        "2048",
-       "2048 МБ"
+       "2048 МБ",
+       "2048 MB"
       ],
       [
        "1024",
-       "1024 МБ (рекомендуется при 16 ГБ)"
+       "1024 МБ (рекомендуется при 16 ГБ)",
+       "1024 MB (recommended with 16 GB)"
       ],
       [
        "256",
-       "256 МБ (для 8 ГБ)"
+       "256 МБ (для 8 ГБ)",
+       "256 MB (for 8 GB)"
       ]
      ],
-     "help": ""
+     "help": "",
+     "label_en": "How much memory it may use"
     },
     {
      "section": "load",
@@ -674,14 +801,17 @@
      "choices": [
       [
        "on",
-       "Включено"
+       "Включено",
+       "On"
       ],
       [
        "off",
-       "Выключено"
+       "Выключено",
+       "Off"
       ]
      ],
-     "help": ""
+     "help": "",
+     "label_en": "Warm up file opening"
     }
    ],
    "fixed": [
@@ -750,7 +880,9 @@
      "save_parallel",
      "on"
     ]
-   ]
+   ],
+   "title_en": "Fast game and save loading",
+   "description_en": "Speeds up the game's start (with mods, several times over), save loading and a few calculations during play. Remembers which files the game reads and reads them into memory ahead of time on the next start (data in plugins\\eu4_load_patch_data). The first start after installing or after updating mods runs at the usual pace.\r\n\r\nEvery part was checked by comparison with the game, with no differences. Partly based on the Bellows project (MIT)."
   },
   {
    "id": "loc",
@@ -767,7 +899,9 @@
      "mode",
      "on"
     ]
-   ]
+   ],
+   "title_en": "Fast text (localisation) loading",
+   "description_en": "Speeds up loading the texts of the game and mods: with our mods 37 s became 6 s. The text table comes out exactly the same (checked with a checksum)."
   },
   {
    "id": "menu",
@@ -784,7 +918,9 @@
      "mode",
      "on"
     ]
-   ]
+   ],
+   "title_en": "\"Exit to Menu\" without restarting the game",
+   "description_en": "\"Exit to Menu\" and \"Back\" return straight to the main menu instead of restarting the whole game. Does not affect calculations within a campaign.\r\n\r\nA port of the open-source mod Hamweard (MIT)."
   },
   {
    "id": "save",
@@ -804,14 +940,18 @@
      "choices": [
       [
        "on",
-       "Включено"
+       "Включено",
+       "On"
       ],
       [
        "off",
-       "Выключено"
+       "Выключено",
+       "Off"
       ]
      ],
-     "help": "0 расхождений на 10,6 млн чисел."
+     "help": "0 расхождений на 10,6 млн чисел.",
+     "label_en": "Fast number formatting",
+     "help_en": "0 differences in 10.6 million numbers."
     },
     {
      "section": "save",
@@ -821,14 +961,18 @@
      "choices": [
       [
        "on",
-       "Включено"
+       "Включено",
+       "On"
       ],
       [
        "off",
-       "Выключено"
+       "Выключено",
+       "Off"
       ]
      ],
-     "help": "Только для несжатых сохранений и вместе с быстрым форматированием."
+     "help": "Только для несжатых сохранений и вместе с быстрым форматированием.",
+     "label_en": "Write the file on a background thread",
+     "help_en": "Only for uncompressed saves and together with fast formatting."
     }
    ],
    "fixed": [
@@ -837,7 +981,9 @@
      "mode",
      "off"
     ]
-   ]
+   ],
+   "title_en": "Fast saving",
+   "description_en": "Autosaves are about a third faster: numbers are written with a fast method (character for character as the game writes them), and the file is written to disk by a background thread while the game is still building the save. The save file is exactly the same as without the plugin."
   }
  ],
  "borderless": {
@@ -845,6 +991,8 @@
   "file": "Paradox Interactive/Europa Universalis IV/pdx_settings.txt",
   "pattern": "display_mode\\s*=\\s*\"?[a-z_]+\"?",
   "replace": "display_mode=\"borderless_fullscreen\"",
-  "label": "Переключить игру в режим «без рамки» (нужно для DXVK)"
- }
+  "label": "Переключить игру в режим «без рамки» (нужно для DXVK)",
+  "label_en": "Switch the game to borderless fullscreen (needed for DXVK)"
+ },
+ "title_en": "EU4 speed-up — version 4.2"
 }

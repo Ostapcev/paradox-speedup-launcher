@@ -1,59 +1,62 @@
-# Ускорение игр Paradox — установщик
+# Paradox games speed-up — installer
 
-`release/Uskorenie_Paradox.exe` — один файл, ~90 КБ (WPF). Нужен только .NET Framework 4.8, он есть в Windows 10/11.
+[Русская версия](README.ru.md)
 
-![окно](docs/launcher_eu4_country.png)
+`release/Uskorenie_Paradox.exe` is a single file of about 140 KB (WPF). It needs only .NET Framework 4.8, which Windows 10/11 already have. The interface is in English and Russian: the installer follows the Windows display language, and the switch at the bottom left changes it.
 
-## Что делает
+![window](docs/launcher_eu4_country.png)
 
-- Показывает все игры из каталога. У каждой игры свой набор плагинов; если плагинов пока нет, игра помечена «скоро».
-- Сам находит каждую игру через реестр Steam, `libraryfolders.vdf` и `appmanifest_<appid>.acf`. Папку можно указать вручную, выбор запоминается.
-- Проверяет версию игры по SHA-256 exe.
-- Скачивает описание плагинов и архив, сверяет контрольные суммы.
-- Три режима: «Все плагины», «Только точные», «Выборочно».
-- Для каждого плагина показывает описание и его настройки.
-- Записывает ini, сохраняя комментарии и настройки пользователя при обновлении.
-- Убирает отключённые плагины. Чужой `VERSION.dll`/`d3d9.dll` сохраняет и возвращает при удалении.
-- Кнопка «Проверить работу» читает журналы плагинов после запуска игры.
+## What it does
 
-## Как устроены файлы
+- Shows every game from the catalogue. Each game has its own plugin set; a game without plugins yet is marked "coming".
+- Finds each game by itself: in Steam (registry, `libraryfolders.vdf`, `appmanifest_<appid>.acf`) and in GOG (GOG Galaxy and offline installers: the `GOG.com\Games` registry key, the uninstall list, the default folders). The folder can also be chosen by hand; the choice is remembered.
+- Checks the game version by the SHA-256 of the exe (Steam and GOG builds of EU4 1.37.5).
+- Downloads the plugin descriptions and the archive, and verifies the checksums.
+- Three modes: "All plugins", "Exact only", "Custom".
+- Shows a description and the settings of every plugin.
+- Writes the ini files, keeping comments and the user's settings on update.
+- Removes plugins that were turned off. Keeps a foreign `VERSION.dll`/`d3d9.dll` and puts it back on removal.
+- The "Check" button reads the plugin logs after the game has run.
 
-| Файл | Что это |
+## Files
+
+| File | What it is |
 |---|---|
-| `catalog_src.json` | Список игр: id, название, Steam appid, путь к exe, имя процесса, цвет, статус (`available` или `planned`). |
-| `games/<id>/manifest_src.json` | Плагины одной игры: файлы, ini, описания, настройки, значения для «Только точные». |
-| `tools/make_release.py` | Собирает `release/<id>_plugins.zip`, `release/<id>_manifest.json` (с контрольными суммами) и `release/catalog.json`. |
-| `tools/build.py` | Собирает exe компилятором .NET Framework (`src/Launcher.cs` + вшитый `src/MainWindow.xaml`). |
+| `catalog_src.json` | The list of games: id, name, Steam appid, exe path, process name, colour, status (`available` or `planned`). |
+| `games/<id>/manifest_src.json` | The plugins of one game: files, ini, descriptions, settings, values for "Exact only", accepted exe hashes and their builds (`exe_builds`), builds a plugin works on (`builds`). Texts in English are in `*_en` fields, and a choice's third element is its English label. |
+| `tools/make_release.py` | Builds `release/<id>_plugins.zip`, `release/<id>_manifest.json` (with checksums) and `release/catalog.json`. |
+| `tools/build.py` | Builds the exe with the .NET Framework compiler (`src/Launcher.cs` + the embedded `src/MainWindow.xaml`). |
 
-## Как выпустить плагины
+## Releasing plugins
 
-1. Обновите `version` и описания в `games/<id>/manifest_src.json`.
-2. Соберите файлы релиза из папки, которая копируется в игру:
-   `python tools/make_release.py eu4 "..\eu4_package\EU4_uskorenie_1.37.5_v3\2_V_PAPKU_IGRY"`
-3. Загрузите в один GitHub Release репозитория `paradox-speedup` все файлы `release/*.json` и `release/*_plugins.zip`.
-   Установщик всегда берёт их из `releases/latest/download/…`, поэтому раздавать новый exe не нужно.
+1. Update `version` and the descriptions (Russian and `*_en`) in `games/<id>/manifest_src.json`.
+2. Build the release files from the folder that is copied into the game:
+   `python tools/make_release.py eu4 "..\eu4_package\launcher_v4_2"`
+3. Upload all `release/*.json` files and `release/*_plugins.zip` to one GitHub Release of the `paradox-speedup` repository.
+   The installer always takes them from `releases/latest/download/…`, so there is no need to hand out a new exe.
 
-## Как добавить новую игру
+## Adding a game
 
-1. В `catalog_src.json` у игры поставьте `"status": "available"` и `"manifest": "<id>_manifest.json"`.
-2. Создайте `games/<id>/manifest_src.json` по образцу EU4.
-3. Выполните `make_release.py <id> <папка>`.
+1. In `catalog_src.json` set `"status": "available"` and `"manifest": "<id>_manifest.json"` for the game.
+2. Create `games/<id>/manifest_src.json` following the EU4 one.
+3. Run `make_release.py <id> <folder>`.
 
-## Где лежат файлы
+## Where things are
 
-Установщик читает каталог из релизов репозитория плагинов: <https://github.com/Ostapcev/paradox-speedup/releases> (адрес — `Config.DefaultSource` в `src/Launcher.cs`). Готовый exe — в [релизах этого репозитория](https://github.com/Ostapcev/paradox-speedup-launcher/releases). Код плагинов — <https://github.com/Ostapcev/paradox-speedup>.
+The installer reads the catalogue from the releases of the plugin repository: <https://github.com/Ostapcev/paradox-speedup/releases> (the address is `Config.DefaultSource` in `src/Launcher.cs`). The ready exe is in the [releases of this repository](https://github.com/Ostapcev/paradox-speedup-launcher/releases). The plugin code is at <https://github.com/Ostapcev/paradox-speedup>.
 
-## Параметры командной строки
+## Command line
 
-| Параметр | Что делает |
+| Option | What it does |
 |---|---|
-| `--source <url или папка>` | Другой источник каталога; например, локальная папка `release`. |
-| `--game <id>` | Какую игру открыть. |
-| `--dir <папка>` | Папка этой игры. |
-| `--auto all\|exact\|uninstall\|check\|shot[:плагин[:log]]` | Сделать одно действие без участия пользователя и записать `launcher_auto.log` рядом с exe. |
+| `--source <url or folder>` | Another catalogue source, for example the local `release` folder. |
+| `--game <id>` | Which game to open. |
+| `--dir <folder>` | The folder of that game. |
+| `--lang en\|ru` | Interface language (otherwise the saved choice or the Windows language). |
+| `--auto all\|exact\|uninstall\|check\|shot[:plugin[:log]]` | Do one action without the user and write `launcher_auto.log` next to the exe. |
 
-## Лицензия
+## Licence
 
-MIT, см. [LICENSE](LICENSE). Плагины, которые раздаёт установщик, идут вместе со своими лицензиями (Bellows, Hamweard, EU4 Unicode Patch, DXVK).
+MIT, see [LICENSE](LICENSE). The plugins the installer hands out come with their own licences (Bellows, Hamweard, EU4 Unicode Patch, DXVK).
 
-Проект не связан с Paradox Interactive.
+This project is not affiliated with Paradox Interactive.
