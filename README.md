@@ -10,7 +10,7 @@
 
 - Shows every game from the catalogue. Each game has its own plugin set; a game without plugins yet is marked "coming".
 - Finds each game by itself: in Steam (registry, `libraryfolders.vdf`, `appmanifest_<appid>.acf`) and in GOG (GOG Galaxy and offline installers: the `GOG.com\Games` registry key, the uninstall list, the default folders). The folder can also be chosen by hand; the choice is remembered.
-- Checks the game version by the SHA-256 of the exe (Steam and GOG builds of EU4 1.37.5).
+- Checks the game version by the SHA-256 of the exe (Steam and GOG builds of EU4 1.37.5, Steam builds of HoI4 1.19.4.2 and 1.19.5.0).
 - Downloads the plugin descriptions and the archive, and verifies the checksums.
 - Three modes: "All plugins", "Exact only", "Custom".
 - Shows a description and the settings of every plugin.
@@ -34,6 +34,7 @@
    `python tools/make_release.py eu4 "..\eu4_package\launcher_v4_2"`
 3. Upload all `release/*.json` files and `release/*_plugins.zip` to one GitHub Release of the `paradox-speedup` repository.
    The installer always takes them from `releases/latest/download/…`, so there is no need to hand out a new exe.
+   The latest release must hold the files of every available game (for example `eu4_*` and `hoi4_*`), not only the game that changed.
 
 ## Adding a game
 

@@ -1,0 +1,301 @@
+{
+ "version": "1.0",
+ "title": "Ускорение HoI4 — версия 1.0",
+ "title_en": "HoI4 speed-up — version 1.0",
+ "game_version": "1.19.5",
+ "exe_sha256": [
+  "709f916afbebcfe64a26678702691aeb40945d206074c2a80de8e9d601fce148",
+  "bccc62909b6a1ec2c1d5a46ef18608e4d0c7cdc89ad341b7402a23c40f7a8037"
+ ],
+ "exe_builds": {
+  "709f916afbebcfe64a26678702691aeb40945d206074c2a80de8e9d601fce148": "Steam",
+  "bccc62909b6a1ec2c1d5a46ef18608e4d0c7cdc89ad341b7402a23c40f7a8037": "Steam"
+ },
+ "package": "hoi4_plugins.zip",
+ "components": [
+  {
+   "id": "loader",
+   "required": true,
+   "exact": true,
+   "title": "Загрузчик плагинов (VERSION.dll)",
+   "title_en": "Plugin loader (VERSION.dll)",
+   "files": [
+    "VERSION.dll"
+   ],
+   "description": "Загружает плагины из папки plugins при запуске игры. Сам hoi4.exe на диске не меняется: плагины меняют код игры только в памяти.\r\n\r\nКаждый плагин сначала проверяет сборку hoi4.exe (1.19.5.0 или 1.19.4.2) и байты во всех местах, которые меняет. Если что-то не совпало, он пишет REFUSED в свой журнал и ничего не трогает.",
+   "description_en": "Loads the plugins from the plugins folder when the game starts. hoi4.exe on disk is never changed: the plugins change the game's code only in memory.\r\n\r\nEvery plugin first checks the hoi4.exe build (1.19.5.0 or 1.19.4.2) and the bytes at every place it changes. If anything differs, it writes REFUSED to its log and touches nothing."
+  },
+  {
+   "id": "render",
+   "exact": true,
+   "title": "Реже рисовать кадры на быстрой игре",
+   "title_en": "Draw fewer frames at fast speeds",
+   "files": [
+    "plugins/hoi4_render_patch.dll"
+   ],
+   "ini": "plugins/hoi4_render_patch.ini",
+   "fixed": [
+    [
+     "render",
+     "mode",
+     "throttle"
+    ],
+    [
+     "render",
+     "supply_interval",
+     "1"
+    ],
+    [
+     "render",
+     "ai_frames",
+     "0"
+    ]
+   ],
+   "description": "Пока игровые часы идут быстро, игра тратит много времени главного потока на кадры, графику провинций и модельки юнитов. Плагин обновляет их реже. На паузе, в меню и на медленных скоростях всё рисуется как обычно.\r\n\r\nНа расчёты игры не влияет: меняется только то, как часто обновляется картинка.",
+   "description_en": "While the game hours pass quickly, the game spends a lot of main-thread time on frames, province graphics and unit models. The plugin updates them less often. When paused, in menus and at slow speeds everything is drawn as usual.\r\n\r\nDoes not affect the game's calculations: only how often the picture is updated changes.",
+   "settings": [
+    {
+     "section": "render",
+     "key": "frame_interval",
+     "default": "0.1",
+     "label": "Кадров в секунду на быстрой игре",
+     "label_en": "Frames per second at fast speeds",
+     "choices": [
+      [
+       "0.1",
+       "10 (рекомендуется) — быстрее всего",
+       "10 (recommended) — fastest"
+      ],
+      [
+       "0.05",
+       "20",
+       "20"
+      ],
+      [
+       "0.0333333",
+       "30",
+       "30"
+      ],
+      [
+       "0.0166667",
+       "60 — плавно, ускорение меньше",
+       "60 — smooth, smaller speed-up"
+      ],
+      [
+       "0",
+       "Без ограничения (как в обычной игре)",
+       "No limit (as in the normal game)"
+      ]
+     ],
+     "help": "Меньше кадров — быстрее идут часы, но картинка дёрганее.",
+     "help_en": "Fewer frames: hours pass faster, but the picture is choppier."
+    },
+    {
+     "section": "render",
+     "key": "provinces_interval",
+     "default": "0.25",
+     "label": "Обновление графики провинций",
+     "label_en": "Province graphics updates",
+     "choices": [
+      [
+       "0.1",
+       "10 раз в секунду",
+       "10 times a second"
+      ],
+      [
+       "0.25",
+       "4 раза в секунду (рекомендуется)",
+       "4 times a second (recommended)"
+      ],
+      [
+       "0.5",
+       "2 раза в секунду",
+       "2 times a second"
+      ],
+      [
+       "0",
+       "Каждый кадр (как в обычной игре)",
+       "Every frame (as in the normal game)"
+      ]
+     ],
+     "help": "Только пока игра идёт быстро; на паузе — каждый кадр.",
+     "help_en": "Only while the game runs fast; when paused, every frame."
+    },
+    {
+     "section": "render",
+     "key": "unitgfx_interval",
+     "default": "0.1",
+     "label": "Обновление моделек и счётчиков юнитов",
+     "label_en": "Unit model and counter updates",
+     "choices": [
+      [
+       "0.1",
+       "10 раз в секунду (рекомендуется)",
+       "10 times a second (recommended)"
+      ],
+      [
+       "0.25",
+       "4 раза в секунду",
+       "4 times a second"
+      ],
+      [
+       "0",
+       "Каждый кадр (как в обычной игре)",
+       "Every frame (as in the normal game)"
+      ]
+     ],
+     "help": "",
+     "help_en": ""
+    },
+    {
+     "section": "render",
+     "key": "scene_interval",
+     "default": "0.1",
+     "label": "Обновление 3D-сцены",
+     "label_en": "3D scene updates",
+     "choices": [
+      [
+       "0.05",
+       "20 раз в секунду",
+       "20 times a second"
+      ],
+      [
+       "0.1",
+       "10 раз в секунду (рекомендуется)",
+       "10 times a second (recommended)"
+      ],
+      [
+       "0",
+       "Каждый кадр (как в обычной игре)",
+       "Every frame (as in the normal game)"
+      ]
+     ],
+     "help": "Пропущенное время копится, поэтому анимации идут с той же скоростью.",
+     "help_en": "Skipped time is carried over, so animations keep the same speed."
+    }
+   ]
+  },
+  {
+   "id": "supply",
+   "exact": true,
+   "title": "Кэш расчёта снабжения",
+   "title_en": "Supply calculation cache",
+   "files": [
+    "plugins/hoi4_supply_patch.dll"
+   ],
+   "ini": "plugins/hoi4_supply_patch.ini",
+   "fixed": [
+    [
+     "supply",
+     "mode",
+     "on"
+    ]
+   ],
+   "description": "Снабжение — одна из самых тяжёлых частей часового тика в поздней игре. Если у страны с прошлого часа не изменилось ничего, от чего зависит её снабжение, плагин не считает пути заново, а берёт прошлый результат.\r\n\r\nРезультат побайтно тот же, что у игры: в режиме проверки около 477 тысяч повторов, 0 расхождений.",
+   "description_en": "Supply is one of the heaviest parts of the hourly tick late in the game. If nothing a country's supply depends on has changed since the last hour, the plugin does not compute the paths again and reuses the last result.\r\n\r\nThe result is byte for byte the same as the game's: about 477 thousand reuses in verify mode, 0 differences."
+  },
+  {
+   "id": "load",
+   "exact": true,
+   "title": "Быстрый запуск игры",
+   "title_en": "Fast game start-up",
+   "files": [
+    "plugins/hoi4_load_patch.dll"
+   ],
+   "ini": "plugins/hoi4_load_patch.ini",
+   "fixed": [
+    [
+     "load",
+     "phases",
+     "off"
+    ]
+   ],
+   "description": "Ускоряет запуск игры и загрузку сохранений. Реестр триггеров удаляет записи без полного перебора (он доходит до 1,4 млн записей). На поиск несуществующих файлов в папках DLC (около 1,1 млн при запуске) сразу отвечает так же, как Windows. Поиск стран по тегу при загрузке сохранения идёт по таблице, а не перебором.\r\n\r\nПоведение игры не меняется.",
+   "description_en": "Speeds up the game start and save loading. The trigger registry removes entries without a full scan (it reaches 1.4 million entries). Lookups of missing files in the DLC folders (about 1.1 million at start-up) get the same answer Windows would give, at once. Country tag lookups while a save loads use a table instead of a scan.\r\n\r\nThe game's behaviour does not change.",
+   "settings": [
+    {
+     "section": "load",
+     "key": "registry",
+     "default": "on",
+     "label": "Быстрый реестр триггеров",
+     "label_en": "Fast trigger registry",
+     "choices": [
+      [
+       "on",
+       "Включено",
+       "On"
+      ],
+      [
+       "off",
+       "Выключено",
+       "Off"
+      ]
+     ],
+     "help": "",
+     "help_en": ""
+    },
+    {
+     "section": "load",
+     "key": "files",
+     "default": "on",
+     "label": "Индекс файлов игры",
+     "label_en": "Game file index",
+     "choices": [
+      [
+       "on",
+       "Включено",
+       "On"
+      ],
+      [
+       "off",
+       "Выключено",
+       "Off"
+      ]
+     ],
+     "help": "Если игра что-то создаёт в своей папке, индекс сам выключается до конца сессии.",
+     "help_en": "If the game creates anything in its folder, the index turns itself off for the rest of the session."
+    },
+    {
+     "section": "load",
+     "key": "tags",
+     "default": "on",
+     "label": "Быстрый поиск тегов стран",
+     "label_en": "Fast country tag lookup",
+     "choices": [
+      [
+       "on",
+       "Включено",
+       "On"
+      ],
+      [
+       "off",
+       "Выключено",
+       "Off"
+      ]
+     ],
+     "help": "",
+     "help_en": ""
+    }
+   ]
+  },
+  {
+   "id": "alloc",
+   "exact": false,
+   "title": "Быстрое выделение памяти",
+   "title_en": "Fast memory allocation",
+   "files": [
+    "plugins/hoi4_alloc_patch.dll"
+   ],
+   "ini": "plugins/hoi4_alloc_patch.ini",
+   "fixed": [
+    [
+     "alloc",
+     "mode",
+     "on"
+    ]
+   ],
+   "description": "Заменяет выделение памяти игры на более быстрое, с кэшем для каждого потока.\r\n\r\nМеняет ход игры: у объектов другие адреса в памяти, а от них может зависеть порядок части расчётов. Партия идёт так же честно, но не повторяет в точности партию без плагинов. В режиме «Только точные» не ставится.",
+   "description_en": "Replaces the game's memory allocation with a faster one with a cache for each thread.\r\n\r\nChanges gameplay: objects get other memory addresses, and the order of some calculations may depend on them. The campaign is just as fair, but it does not repeat a campaign without plugins exactly. Not installed in “Exact only” mode."
+  }
+ ]
+}

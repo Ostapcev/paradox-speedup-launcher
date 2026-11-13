@@ -22,7 +22,8 @@
    "process": "hoi4",
    "install_dir": "Hearts of Iron IV",
    "accent": "#5B6B4A",
-   "status": "planned"
+   "manifest": "hoi4_manifest.json",
+   "status": "available"
   },
   {
    "id": "ck3",
