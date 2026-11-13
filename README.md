@@ -53,6 +53,7 @@ The installer reads the catalogue from the releases of the plugin repository: <h
 | `--game <id>` | Which game to open. |
 | `--dir <folder>` | The folder of that game. |
 | `--lang en\|ru` | Interface language (otherwise the saved choice or the Windows language). |
+| `--ui-culture <name>` | For testing: act as if the Windows display language were this one (for example `en-US`). |
 | `--auto all\|exact\|uninstall\|check\|shot[:plugin[:log]]` | Do one action without the user and write `launcher_auto.log` next to the exe. |
 
 ## Licence

@@ -1501,6 +1501,12 @@ namespace SpeedLauncher
                 else if (args[i] == "--game") gameId = args[++i];
                 else if (args[i] == "--auto") Auto = args[++i];
                 else if (args[i] == "--lang") lang = args[++i];
+                else if (args[i] == "--ui-culture")   // testing: act as if Windows' display language were this
+                {
+                    var culture = new System.Globalization.CultureInfo(args[++i]);
+                    System.Threading.Thread.CurrentThread.CurrentUICulture = culture;
+                    System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = culture;
+                }
             }
             L.Choose(lang);
             var app = new Application { ShutdownMode = ShutdownMode.OnMainWindowClose };
