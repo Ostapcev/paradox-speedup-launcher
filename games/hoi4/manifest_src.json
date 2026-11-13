@@ -1,7 +1,7 @@
 {
- "version": "1.0",
- "title": "Ускорение HoI4 — версия 1.0",
- "title_en": "HoI4 speed-up — version 1.0",
+ "version": "1.1",
+ "title": "Ускорение HoI4 — версия 1.1",
+ "title_en": "HoI4 speed-up — version 1.1",
  "game_version": "1.19.5",
  "exe_sha256": [
   "709f916afbebcfe64a26678702691aeb40945d206074c2a80de8e9d601fce148",
@@ -172,6 +172,58 @@
      ],
      "help": "Пропущенное время копится, поэтому анимации идут с той же скоростью.",
      "help_en": "Skipped time is carried over, so animations keep the same speed."
+    },
+    {
+     "section": "render",
+     "key": "tick_interval",
+     "default": "0.25",
+     "label": "Обновление картинки во время длинного тика",
+     "label_en": "Picture updates during a long tick",
+     "choices": [
+      [
+       "0",
+       "Как в обычной игре",
+       "As in the normal game"
+      ],
+      [
+       "0.1",
+       "10 раз в секунду",
+       "10 times a second"
+      ],
+      [
+       "0.25",
+       "4 раза в секунду (рекомендуется)",
+       "4 times a second (recommended)"
+      ],
+      [
+       "0.5",
+       "2 раза в секунду — быстрее",
+       "2 times a second — faster"
+      ]
+     ],
+     "help": "Во время длинного тика игра обрабатывает и нажатия клавиш, в том числе паузу. Чем реже, тем позже срабатывает пауза.",
+     "help_en": "During a long tick the game also handles key presses, pause included. The rarer, the later pause takes effect."
+    },
+    {
+     "section": "render",
+     "key": "ai_wait",
+     "default": "1",
+     "label": "Ожидание ИИ без постоянной отдачи потока",
+     "label_en": "AI wait without constant thread yields",
+     "choices": [
+      [
+       "1",
+       "Включено",
+       "On"
+      ],
+      [
+       "0",
+       "Как в обычной игре",
+       "As in the normal game"
+      ]
+     ],
+     "help": "Пока главный поток ждёт ежечасный ИИ, он делает короткие паузы вместо постоянного SwitchToThread.",
+     "help_en": "While the main thread waits for the hourly AI, it makes short pauses instead of calling SwitchToThread all the time."
     }
    ]
   },
@@ -193,6 +245,35 @@
    ],
    "description": "Снабжение — одна из самых тяжёлых частей часового тика в поздней игре. Если у страны с прошлого часа не изменилось ничего, от чего зависит её снабжение, плагин не считает пути заново, а берёт прошлый результат.\r\n\r\nРезультат побайтно тот же, что у игры: в режиме проверки около 477 тысяч повторов, 0 расхождений.",
    "description_en": "Supply is one of the heaviest parts of the hourly tick late in the game. If nothing a country's supply depends on has changed since the last hour, the plugin does not compute the paths again and reuses the last result.\r\n\r\nThe result is byte for byte the same as the game's: about 477 thousand reuses in verify mode, 0 differences."
+  },
+  {
+   "id": "tick",
+   "exact": true,
+   "title": "Мелкие параллельные циклы — в одном потоке",
+   "title_en": "Small parallel loops on one thread",
+   "files": [
+    "plugins/hoi4_tick_patch.dll"
+   ],
+   "ini": "plugins/hoi4_tick_patch.ini",
+   "fixed": [
+    [
+     "tick",
+     "pfor",
+     "on"
+    ],
+    [
+     "tick",
+     "mods",
+     "off"
+    ],
+    [
+     "tick",
+     "aiprof",
+     "0"
+    ]
+   ],
+   "description": "В 23 местах часового тика игра раздаёт рабочим потокам такие маленькие куски работы, что раздача и ожидание стоят дольше самой работы. Плагин выполняет их сразу в вызывающем потоке — тем же путём, каким игра сама считает цикл из одного задания.\r\n\r\nНа расчёты игры не влияет: работа та же, меняется только поток, который её делает.",
+   "description_en": "In 23 places of the hourly tick the game hands the worker threads pieces of work so small that handing out and waiting take longer than the work. The plugin runs them right away in the calling thread, the same way the game itself runs a loop with a single job.\r\n\r\nDoes not affect the game's calculations: the work is the same, only the thread doing it changes."
   },
   {
    "id": "load",
