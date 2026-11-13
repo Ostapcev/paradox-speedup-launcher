@@ -1,5 +1,5 @@
 {
- "version": "4.2",
+ "version": "4.3",
  "title": "Ускорение EU4 — версия 4.2",
  "game_version": "1.37.5",
  "exe_sha256": [
@@ -150,9 +150,9 @@
        "As in the game (every frame)"
       ]
      ],
-     "help": "Для игры за страну. Предупреждение может исчезать с задержкой до полсекунды.",
+     "help": "Для игры за страну, только на скорости 5. Предупреждение может исчезать с задержкой до полсекунды. На паузе — как в игре.",
      "label_en": "Top-bar alerts",
-     "help_en": "When playing a country. An alert may disappear up to half a second late."
+     "help_en": "When playing a country, at speed 5 only. An alert may disappear up to half a second late. On pause, as in the game."
     },
     {
      "section": "render",
@@ -171,9 +171,9 @@
        "As in the game (every frame)"
       ]
      ],
-     "help": "Числа на значках (цены, осады) меняются с задержкой до полсекунды.",
+     "help": "Только на скорости 5. Числа на значках (цены, осады) меняются с задержкой до полсекунды. На паузе — как в игре.",
      "label_en": "Icons over provinces",
-     "help_en": "Numbers on icons (prices, sieges) change up to half a second late."
+     "help_en": "At speed 5 only. Numbers on icons (prices, sieges) change up to half a second late. On pause, as in the game."
     },
     {
      "section": "render",
