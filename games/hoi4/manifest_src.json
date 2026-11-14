@@ -1,5 +1,5 @@
 {
- "version": "1.3",
+ "version": "1.4",
  "title": "Ускорение HoI4 — версия 1.1",
  "title_en": "HoI4 speed-up — version 1.1",
  "game_version": "1.19.5",
@@ -59,6 +59,11 @@
      "render",
      "unitgfx_interval",
      "0"
+    ],
+    [
+     "render",
+     "scene_interval",
+     "0.1"
     ]
    ],
    "description": "Пока игровые часы идут быстро, игра тратит много времени главного потока на кадры и 3D-сцену. Плагин рисует их реже. На паузе, в меню и на медленных скоростях всё рисуется как обычно.\r\n\r\nНа расчёты игры не влияет: меняется только то, как часто обновляется картинка.",
@@ -99,32 +104,6 @@
      ],
      "help": "Меньше кадров — быстрее идут часы, но картинка дёрганее.",
      "help_en": "Fewer frames: hours pass faster, but the picture is choppier."
-    },
-    {
-     "section": "render",
-     "key": "scene_interval",
-     "default": "0.1",
-     "label": "Обновление 3D-сцены",
-     "label_en": "3D scene updates",
-     "choices": [
-      [
-       "0.05",
-       "20 раз в секунду",
-       "20 times a second"
-      ],
-      [
-       "0.1",
-       "10 раз в секунду (рекомендуется)",
-       "10 times a second (recommended)"
-      ],
-      [
-       "0",
-       "Каждый кадр (как в обычной игре)",
-       "Every frame (as in the normal game)"
-      ]
-     ],
-     "help": "Пропущенное время копится, поэтому анимации идут с той же скоростью.",
-     "help_en": "Skipped time is carried over, so animations keep the same speed."
     },
     {
      "section": "render",
