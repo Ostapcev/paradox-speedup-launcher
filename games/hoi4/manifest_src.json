@@ -1,5 +1,5 @@
 {
- "version": "1.1",
+ "version": "1.2",
  "title": "Ускорение HoI4 — версия 1.1",
  "title_en": "HoI4 speed-up — version 1.1",
  "game_version": "1.19.5",
@@ -57,19 +57,19 @@
     {
      "section": "render",
      "key": "frame_interval",
-     "default": "0.1",
+     "default": "0.05",
      "label": "Кадров в секунду на быстрой игре",
      "label_en": "Frames per second at fast speeds",
      "choices": [
       [
        "0.1",
-       "10 (рекомендуется) — быстрее всего",
-       "10 (recommended) — fastest"
+       "10 — быстрее всего, картинка дёрганее",
+       "10 — fastest, choppier picture"
       ],
       [
        "0.05",
-       "20",
-       "20"
+       "20 (рекомендуется)",
+       "20 (recommended)"
       ],
       [
        "0.0333333",
