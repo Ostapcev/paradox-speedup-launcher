@@ -1,5 +1,5 @@
 {
- "version": "1.2",
+ "version": "1.3",
  "title": "Ускорение HoI4 — версия 1.1",
  "title_en": "HoI4 speed-up — version 1.1",
  "game_version": "1.19.5",
@@ -49,10 +49,20 @@
      "render",
      "ai_frames",
      "0"
+    ],
+    [
+     "render",
+     "provinces_interval",
+     "0"
+    ],
+    [
+     "render",
+     "unitgfx_interval",
+     "0"
     ]
    ],
-   "description": "Пока игровые часы идут быстро, игра тратит много времени главного потока на кадры, графику провинций и модельки юнитов. Плагин обновляет их реже. На паузе, в меню и на медленных скоростях всё рисуется как обычно.\r\n\r\nНа расчёты игры не влияет: меняется только то, как часто обновляется картинка.",
-   "description_en": "While the game hours pass quickly, the game spends a lot of main-thread time on frames, province graphics and unit models. The plugin updates them less often. When paused, in menus and at slow speeds everything is drawn as usual.\r\n\r\nDoes not affect the game's calculations: only how often the picture is updated changes.",
+   "description": "Пока игровые часы идут быстро, игра тратит много времени главного потока на кадры и 3D-сцену. Плагин рисует их реже. На паузе, в меню и на медленных скоростях всё рисуется как обычно.\r\n\r\nНа расчёты игры не влияет: меняется только то, как часто обновляется картинка.",
+   "description_en": "While the game hours pass quickly, the game spends a lot of main-thread time on frames and the 3D scene. The plugin draws them less often. When paused, in menus and at slow speeds everything is drawn as usual.\r\n\r\nDoes not affect the game's calculations: only how often the picture is updated changes.",
    "settings": [
     {
      "section": "render",
@@ -89,63 +99,6 @@
      ],
      "help": "Меньше кадров — быстрее идут часы, но картинка дёрганее.",
      "help_en": "Fewer frames: hours pass faster, but the picture is choppier."
-    },
-    {
-     "section": "render",
-     "key": "provinces_interval",
-     "default": "0.25",
-     "label": "Обновление графики провинций",
-     "label_en": "Province graphics updates",
-     "choices": [
-      [
-       "0.1",
-       "10 раз в секунду",
-       "10 times a second"
-      ],
-      [
-       "0.25",
-       "4 раза в секунду (рекомендуется)",
-       "4 times a second (recommended)"
-      ],
-      [
-       "0.5",
-       "2 раза в секунду",
-       "2 times a second"
-      ],
-      [
-       "0",
-       "Каждый кадр (как в обычной игре)",
-       "Every frame (as in the normal game)"
-      ]
-     ],
-     "help": "Только пока игра идёт быстро; на паузе — каждый кадр.",
-     "help_en": "Only while the game runs fast; when paused, every frame."
-    },
-    {
-     "section": "render",
-     "key": "unitgfx_interval",
-     "default": "0.1",
-     "label": "Обновление моделек и счётчиков юнитов",
-     "label_en": "Unit model and counter updates",
-     "choices": [
-      [
-       "0.1",
-       "10 раз в секунду (рекомендуется)",
-       "10 times a second (recommended)"
-      ],
-      [
-       "0.25",
-       "4 раза в секунду",
-       "4 times a second"
-      ],
-      [
-       "0",
-       "Каждый кадр (как в обычной игре)",
-       "Every frame (as in the normal game)"
-      ]
-     ],
-     "help": "",
-     "help_en": ""
     },
     {
      "section": "render",
