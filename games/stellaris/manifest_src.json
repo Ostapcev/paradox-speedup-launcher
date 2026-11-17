@@ -1,0 +1,682 @@
+{
+ "version": "1.0",
+ "title": "Ускорение Stellaris",
+ "title_en": "Stellaris speed-up",
+ "game_version": "4.5.4",
+ "exe_sha256": [
+  "10d2613a392fe8ac7982701899dc2e43ebf4c1c721ea1baeba6c3fb25db36eb1"
+ ],
+ "exe_builds": {
+  "10d2613a392fe8ac7982701899dc2e43ebf4c1c721ea1baeba6c3fb25db36eb1": "Steam"
+ },
+ "package": "stellaris_plugins.zip",
+ "components": [
+  {
+   "id": "loader",
+   "required": true,
+   "exact": true,
+   "title": "Загрузчик плагинов (VERSION.dll)",
+   "title_en": "Plugin loader (VERSION.dll)",
+   "files": [
+    "VERSION.dll"
+   ],
+   "description": "Загружает плагины из папки plugins при запуске игры. Сам stellaris.exe на диске не меняется: плагины меняют код игры только в памяти.\r\n\r\nКаждый плагин сначала проверяет сборку stellaris.exe (Steam 4.5.4) и байты во всех местах, которые меняет. Если что-то не совпало, он пишет REFUSED в свой журнал и ничего не трогает.",
+   "description_en": "Loads the plugins from the plugins folder when the game starts. stellaris.exe on disk is never changed: the plugins change the game's code only in memory.\r\n\r\nEvery plugin first checks the stellaris.exe build (Steam 4.5.4) and the bytes at every place it changes. If anything differs, it writes REFUSED to its log and touches nothing."
+  },
+  {
+   "id": "render",
+   "exact": true,
+   "title": "Реже рисовать кадры во время расчёта дня",
+   "title_en": "Draw fewer frames while a day is calculated",
+   "files": [
+    "plugins/stellaris_render_patch.dll"
+   ],
+   "ini": "plugins/stellaris_render_patch.ini",
+   "fixed": [
+    [
+     "render",
+     "mode",
+     "on"
+    ],
+    [
+     "render",
+     "quiet_skip",
+     "1"
+    ],
+    [
+     "main",
+     "mode",
+     "off"
+    ]
+   ],
+   "settings": [
+    {
+     "section": "render",
+     "key": "frame_interval",
+     "default": "0.1",
+     "label": "Кадров в секунду во время расчёта дня",
+     "label_en": "Frames per second while a day is calculated",
+     "choices": [
+      [
+       "0.1",
+       "10 (рекомендуется)",
+       "10 (recommended)"
+      ],
+      [
+       "0.05",
+       "20",
+       "20"
+      ],
+      [
+       "0.0333333",
+       "30",
+       "30"
+      ],
+      [
+       "0",
+       "Без ограничения (как в обычной игре)",
+       "No limit (as in the normal game)"
+      ]
+     ],
+     "help": "Меньше кадров — быстрее идут дни, но картинка дёрганее.",
+     "help_en": "Fewer frames: days pass faster, but the picture is choppier."
+    }
+   ],
+   "description": "Пока игра считает день, она рисует полный кадр (интерфейс и карту) много раз в секунду; на большой галактике это до четверти времени главного потока. Плагин рисует такие кадры не чаще заданного. На паузе всё рисуется как обычно.",
+   "description_en": "While the game calculates a day, it draws a full frame (interface and map) many times a second; in a large galaxy that is up to a quarter of the main thread. The plugin draws such frames no more often than set. When paused, everything is drawn as usual."
+  },
+  {
+   "id": "budget",
+   "exact": true,
+   "title": "Реже проверять бюджет кадра",
+   "title_en": "Check the frame budget less often",
+   "files": [
+    "plugins/stellaris_budget_patch.dll"
+   ],
+   "ini": "plugins/stellaris_budget_patch.ini",
+   "fixed": [
+    [
+     "budget",
+     "mode",
+     "on"
+    ],
+    [
+     "budget",
+     "every",
+     "16"
+    ]
+   ],
+   "description": "Во время расчёта дня игра около миллиона раз в секунду читает системный таймер, чтобы понять, не пора ли нарисовать кадр. Плагин делает настоящую проверку на каждом 16-м вызове. На состояние игры это не влияет, только на момент отрисовки кадра.",
+   "description_en": "While a day is calculated, the game reads the system timer about a million times a second to see whether a frame is due. The plugin does the real check on every 16th call. The game state is not affected, only the moment a frame is drawn."
+  },
+  {
+   "id": "path",
+   "exact": true,
+   "title": "Быстрый пересчёт расстояний между системами",
+   "title_en": "Fast recalculation of distances between systems",
+   "files": [
+    "plugins/stellaris_path_patch.dll"
+   ],
+   "ini": "plugins/stellaris_path_patch.ini",
+   "fixed": [
+    [
+     "path",
+     "mode",
+     "on"
+    ]
+   ],
+   "description": "При загрузке и пересчёте кэша игра ищет путь между каждой парой систем отдельно; на галактике в 5000 звёзд это около 20 секунд. Плагин строит ту же таблицу расстояний одним проходом на несколько потоков: около 2 секунд.\r\n\r\nНа ход игры не влияет: результат тот же, что у игры (проверено сравнением в режиме тени, 0 расхождений).",
+   "description_en": "On load and on cache recalculation the game searches the path between every pair of systems separately; in a 5000-star galaxy that takes about 20 seconds. The plugin builds the same distance table in one pass on several threads: about 2 seconds.\r\n\r\nDoes not change the game: the result is the same as the game's (checked in shadow mode, 0 differences)."
+  },
+  {
+   "id": "dijk",
+   "exact": true,
+   "title": "Быстрый поиск пути",
+   "title_en": "Fast path search",
+   "files": [
+    "plugins/stellaris_dijk_patch.dll"
+   ],
+   "ini": "plugins/stellaris_dijk_patch.ini",
+   "fixed": [
+    [
+     "dijk",
+     "mode",
+     "on"
+    ],
+    [
+     "dijk",
+     "resume_us",
+     "1000"
+    ],
+    [
+     "dijk",
+     "abab",
+     "0"
+    ]
+   ],
+   "description": "Свой поиск пути между системами вместо игрового: тот же порядок, те же правила при равенстве, но без лишней работы. Если тот же поиск повторяется в течение миллисекунды, плагин продолжает прошлый. Запрос пути стоит на 63% меньше.\r\n\r\nНа ход игры не влияет: результат тот же, что у игры (проверено сравнением в режиме тени, 0 расхождений).",
+   "description_en": "Our own path search between systems instead of the game's: the same order and the same tie rules, without extra work. When the same search repeats within a millisecond, the plugin continues the previous one. A path query costs 63% less.\r\n\r\nDoes not change the game: the result is the same as the game's (checked in shadow mode, 0 differences)."
+  },
+  {
+   "id": "pathq",
+   "exact": true,
+   "title": "Кэш путей без лишних блокировок",
+   "title_en": "Path cache without extra locking",
+   "files": [
+    "plugins/stellaris_pathq_patch.dll"
+   ],
+   "ini": "plugins/stellaris_pathq_patch.ini",
+   "fixed": [
+    [
+     "pathq",
+     "mode",
+     "off"
+    ],
+    [
+     "pathq",
+     "prefetch",
+     "0"
+    ],
+    [
+     "pathq",
+     "batch",
+     "2"
+    ]
+   ],
+   "description": "Найденный путь игра записывает в общий кэш попарно, каждый раз под отдельной блокировкой, а рабочие потоки в это время ждут. Плагин сначала ищет недостающие пары под общей блокировкой и только для их записи берёт исключительную.\r\n\r\nНа ход игры не влияет: результат тот же, что у игры (проверено сравнением в режиме тени, 0 расхождений).",
+   "description_en": "The game writes a found path into the shared cache pair by pair, each time under its own lock, while the worker threads wait. The plugin first looks up the missing pairs under a shared lock and takes the exclusive lock only to insert them.\r\n\r\nDoes not change the game: the result is the same as the game's (checked in shadow mode, 0 differences)."
+  },
+  {
+   "id": "reach",
+   "exact": true,
+   "title": "Быстрая проверка достижимости через врата",
+   "title_en": "Fast reachability check through gateways",
+   "files": [
+    "plugins/stellaris_reach_patch.dll"
+   ],
+   "ini": "plugins/stellaris_reach_patch.ini",
+   "fixed": [
+    [
+     "reach",
+     "mode",
+     "on"
+    ]
+   ],
+   "description": "Проверка, куда страна может добраться через врата, каждый раз заново проходила одну и ту же часть поиска. Плагин повторяет готовую часть вместо расчёта: на поздней игре это с 5% до 1,4% главного потока.\r\n\r\nНа ход игры не влияет: результат тот же, что у игры (проверено сравнением в режиме тени, 0 расхождений).",
+   "description_en": "The check of where a country can travel through gateways redid the same part of the search every time. The plugin replays the finished part instead: late in the game it takes 1.4% of the main thread instead of 5%.\r\n\r\nDoes not change the game: the result is the same as the game's (checked in shadow mode, 0 differences)."
+  },
+  {
+   "id": "fleet",
+   "exact": true,
+   "title": "Быстрый сброс состояния флотов",
+   "title_en": "Fast fleet state reset",
+   "files": [
+    "plugins/stellaris_fleet_patch.dll"
+   ],
+   "ini": "plugins/stellaris_fleet_patch.ini",
+   "fixed": [
+    [
+     "fleet",
+     "mode",
+     "on"
+    ],
+    [
+     "fleet",
+     "prefetch",
+     "on"
+    ]
+   ],
+   "description": "В каждом микротике игра сбрасывает состояние движения флотов отдельными проходами. Плагин делает это одним проходом и заранее подкачивает в кэш процессора данные следующих флотов.\r\n\r\nНа ход игры не влияет: результат тот же, что у игры (проверено сравнением в режиме тени, 0 расхождений).",
+   "description_en": "In every micro tick the game resets the movement state of fleets in separate passes. The plugin does it in one pass and prefetches the next fleets' data into the CPU cache.\r\n\r\nDoes not change the game: the result is the same as the game's (checked in shadow mode, 0 differences)."
+  },
+  {
+   "id": "ship",
+   "exact": true,
+   "title": "Подкачка данных кораблей",
+   "title_en": "Ship data prefetch",
+   "files": [
+    "plugins/stellaris_ship_patch.dll"
+   ],
+   "ini": "plugins/stellaris_ship_patch.ini",
+   "fixed": [
+    [
+     "ship",
+     "mode",
+     "on"
+    ]
+   ],
+   "description": "В цикле кораблей микротика плагин заранее подкачивает в кэш процессора данные следующих кораблей, их флотов и владельцев. Логику игры не меняет: только данные, которые она и так прочитает.\r\n\r\nНа ход игры не влияет: результат тот же, что у игры (проверено сравнением в режиме тени, 0 расхождений).",
+   "description_en": "In the micro-tick ship loop the plugin prefetches the data of the next ships, their fleets and owners into the CPU cache. It does not change the game's logic: only data the game reads anyway.\r\n\r\nDoes not change the game: the result is the same as the game's (checked in shadow mode, 0 differences)."
+  },
+  {
+   "id": "tick",
+   "exact": true,
+   "title": "Подкачка данных в микротике",
+   "title_en": "Micro-tick data prefetch",
+   "files": [
+    "plugins/stellaris_tick_patch.dll"
+   ],
+   "ini": "plugins/stellaris_tick_patch.ini",
+   "fixed": [
+    [
+     "tick",
+     "prefetch",
+     "1"
+    ]
+   ],
+   "description": "Та же подкачка данных в кэш процессора в двух других циклах микротика. Дни идут примерно на 6% быстрее.\r\n\r\nНа ход игры не влияет: результат тот же, что у игры (проверено сравнением в режиме тени, 0 расхождений).",
+   "description_en": "The same CPU-cache prefetch in two other micro-tick loops. Days pass about 6% faster.\r\n\r\nDoes not change the game: the result is the same as the game's (checked in shadow mode, 0 differences)."
+  },
+  {
+   "id": "scan",
+   "exact": true,
+   "title": "Подкачка данных в поиске флотов",
+   "title_en": "Prefetch in the fleet search",
+   "files": [
+    "plugins/stellaris_scan_patch.dll"
+   ],
+   "ini": "plugins/stellaris_scan_patch.ini",
+   "fixed": [
+    [
+     "scan",
+     "prefetch",
+     "1"
+    ],
+    [
+     "scan",
+     "mode",
+     "off"
+    ]
+   ],
+   "description": "Подкачка данных в поиске флотов, который вызывается сотни тысяч раз в секунду. Вызов стоит на 18% меньше.\r\n\r\nНа ход игры не влияет: результат тот же, что у игры (проверено сравнением в режиме тени, 0 расхождений).",
+   "description_en": "Prefetch in the fleet search, which runs hundreds of thousands of times a second. A call costs 18% less.\r\n\r\nDoes not change the game: the result is the same as the game's (checked in shadow mode, 0 differences)."
+  },
+  {
+   "id": "vis",
+   "exact": true,
+   "title": "Быстрый расчёт видимости страны",
+   "title_en": "Fast country visibility calculation",
+   "files": [
+    "plugins/stellaris_vis_patch.dll"
+   ],
+   "ini": "plugins/stellaris_vis_patch.ini",
+   "fixed": [
+    [
+     "vis",
+     "mode",
+     "on"
+    ],
+    [
+     "vis",
+     "lists16",
+     "on"
+    ]
+   ],
+   "description": "В расчёте видимости игра ищет id в длинных списках страны (около тысячи элементов) простым перебором. Плагин отвечает по таблице, построенной один раз на расчёт.\r\n\r\nНа ход игры не влияет: результат тот же, что у игры (проверено сравнением в режиме тени, 0 расхождений).",
+   "description_en": "In the visibility calculation the game looks up ids in long country lists (about a thousand items) one by one. The plugin answers from a table built once per calculation.\r\n\r\nDoes not change the game: the result is the same as the game's (checked in shadow mode, 0 differences)."
+  },
+  {
+   "id": "pair",
+   "exact": true,
+   "title": "Быстрая проверка гиперлиний",
+   "title_en": "Fast hyperlane check",
+   "files": [
+    "plugins/stellaris_pair_patch.dll"
+   ],
+   "ini": "plugins/stellaris_pair_patch.ini",
+   "fixed": [
+    [
+     "pair",
+     "mode",
+     "on"
+    ]
+   ],
+   "description": "В попарной проверке объектов плагин сразу отвечает «нет», если нужной системы нет среди гиперлиний (так в 99,9% случаев), не проходя весь список.\r\n\r\nНа ход игры не влияет: результат тот же, что у игры (проверено сравнением в режиме тени, 0 расхождений).",
+   "description_en": "In the pairwise object check the plugin answers “no” at once when the system is not among the hyperlanes (99.9% of cases), without walking the whole list.\r\n\r\nDoes not change the game: the result is the same as the game's (checked in shadow mode, 0 differences)."
+  },
+  {
+   "id": "tdisp",
+   "exact": true,
+   "title": "Быстрый вызов условий скриптов",
+   "title_en": "Fast script condition calls",
+   "files": [
+    "plugins/stellaris_tdisp_patch.dll"
+   ],
+   "ini": "plugins/stellaris_tdisp_patch.ini",
+   "fixed": [
+    [
+     "tdisp",
+     "mode",
+     "on"
+    ],
+    [
+     "tdisp",
+     "and",
+     "0"
+    ]
+   ],
+   "description": "Каждое условие скрипта сначала проверяет, подходит ли объект. Для каждого класса условий ответ на эту часть проверки постоянен, поэтому плагин ставит короткие готовые переходы. В фазе ИИ это на 10–16% меньше работы.\r\n\r\nНа ход игры не влияет: результат тот же, что у игры (проверено сравнением в режиме тени, 0 расхождений).",
+   "description_en": "Every script condition first checks whether the object fits. For each condition class that part of the answer is constant, so the plugin installs short ready-made jumps. In the AI phase that is 10–16% less work.\r\n\r\nDoes not change the game: the result is the same as the game's (checked in shadow mode, 0 differences)."
+  },
+  {
+   "id": "ai",
+   "exact": true,
+   "title": "Больше рабочих потоков",
+   "title_en": "More worker threads",
+   "files": [
+    "plugins/stellaris_ai_patch.dll"
+   ],
+   "ini": "plugins/stellaris_ai_patch.ini",
+   "fixed": [
+    [
+     "ai",
+     "mode",
+     "off"
+    ],
+    [
+     "threads",
+     "group1",
+     "-1"
+    ],
+    [
+     "threads",
+     "group0",
+     "-1"
+    ]
+   ],
+   "description": "Игра использует не больше половины логических ядер. Плагин даёт пулу задач все логические ядра, кроме двух (например, 14 вместо 7 на 8 ядрах / 16 потоках). Дни идут примерно на 5% быстрее.",
+   "description_en": "The game uses at most half of the logical cores. The plugin gives the task pool all logical cores but two (for example 14 instead of 7 on 8 cores / 16 threads). Days pass about 5% faster."
+  },
+  {
+   "id": "alloc",
+   "exact": false,
+   "title": "Быстрое выделение памяти",
+   "title_en": "Fast memory allocation",
+   "files": [
+    "plugins/stellaris_alloc_patch.dll"
+   ],
+   "ini": "plugins/stellaris_alloc_patch.ini",
+   "fixed": [
+    [
+     "alloc",
+     "mode",
+     "on"
+    ],
+    [
+     "alloc",
+     "max_small",
+     "32768"
+    ],
+    [
+     "alloc",
+     "direct",
+     "1"
+    ]
+   ],
+   "description": "Заменяет выделение памяти игры на более быстрое, с кэшем для каждого потока.\r\n\r\nМеняет ход игры: у объектов другие адреса в памяти, а от них может зависеть порядок части расчётов. Партия идёт так же честно, но не повторяет в точности партию без плагинов. В режиме «Только точные» не ставится.",
+   "description_en": "Replaces the game's memory allocation with a faster one with a cache for each thread.\r\n\r\nChanges gameplay: objects get other memory addresses, and the order of some calculations may depend on them. The campaign is just as fair, but it does not repeat a campaign without plugins exactly. Not installed in “Exact only” mode."
+  },
+  {
+   "id": "aiskip",
+   "exact": false,
+   "title": "ИИ стран думает не каждый день",
+   "title_en": "Country AI does not think every day",
+   "files": [
+    "plugins/stellaris_aiskip_patch.dll"
+   ],
+   "ini": "plugins/stellaris_aiskip_patch.ini",
+   "fixed": [
+    [
+     "aiskip",
+     "mode",
+     "on"
+    ],
+    [
+     "aiskip",
+     "heavy",
+     "0"
+    ]
+   ],
+   "settings": [
+    {
+     "section": "aiskip",
+     "key": "rr",
+     "default": "3",
+     "label": "Как часто ИИ страны думает",
+     "label_en": "How often a country's AI thinks",
+     "choices": [
+      [
+       "3",
+       "Раз в 3 дня (рекомендуется)",
+       "Every 3 days (recommended)"
+      ],
+      [
+       "2",
+       "Раз в 2 дня",
+       "Every 2 days"
+      ],
+      [
+       "1",
+       "Каждый день (как в обычной игре)",
+       "Every day (as in the normal game)"
+      ]
+     ],
+     "help": "",
+     "help_en": ""
+    }
+   ],
+   "description": "Самая дорогая часть дня — ежедневное обновление ИИ каждой страны. Плагин запускает его для каждой страны раз в несколько дней, по очереди. Раз в 3 дня — около +11% к скорости.\r\n\r\nИИ реагирует медленнее: на войну, угрозы и предложения он отвечает с задержкой до 2 дней.\r\n\r\nМеняет ход игры. В режиме «Только точные» не ставится.",
+   "description_en": "The most expensive part of a day is the daily AI update of every country. The plugin runs it for each country once in several days, in turn. Every 3 days gives about +11% speed.\r\n\r\nThe AI reacts slower: it answers wars, threats and offers up to 2 days late.\r\n\r\nChanges gameplay. Not installed in “Exact only” mode."
+  },
+  {
+   "id": "intel",
+   "exact": false,
+   "title": "Разведданные страны не каждый день",
+   "title_en": "Country intel not every day",
+   "files": [
+    "plugins/stellaris_intel_patch.dll"
+   ],
+   "ini": "plugins/stellaris_intel_patch.ini",
+   "fixed": [
+    [
+     "intel",
+     "mode",
+     "on"
+    ],
+    [
+     "intel",
+     "bsearch",
+     "on"
+    ]
+   ],
+   "settings": [
+    {
+     "section": "intel",
+     "key": "rr",
+     "default": "3",
+     "label": "Как часто обновлять разведданные",
+     "label_en": "How often to update intel",
+     "choices": [
+      [
+       "3",
+       "Раз в 3 дня (рекомендуется)",
+       "Every 3 days (recommended)"
+      ],
+      [
+       "2",
+       "Раз в 2 дня",
+       "Every 2 days"
+      ],
+      [
+       "1",
+       "Каждый день (как в обычной игре)",
+       "Every day (as in the normal game)"
+      ]
+     ],
+     "help": "",
+     "help_en": ""
+    }
+   ],
+   "description": "Расчёт видимости систем быстрее (таблица вместо перебора, тот же результат), и страна обновляет разведданные раз в несколько дней, по очереди. Раз в 3 дня — около +4%.\r\n\r\nСведения о системах запаздывают до 2 дней.\r\n\r\nМеняет ход игры. В режиме «Только точные» не ставится.",
+   "description_en": "The system visibility calculation is faster (a table instead of a scan, the same result), and a country updates its intel once in several days, in turn. Every 3 days gives about +4%.\r\n\r\nSystem information may be up to 2 days late.\r\n\r\nChanges gameplay. Not installed in “Exact only” mode."
+  },
+  {
+   "id": "fleetscan",
+   "exact": false,
+   "title": "Известные флоты не каждый день",
+   "title_en": "Known fleets not every day",
+   "files": [
+    "plugins/stellaris_fleetscan_patch.dll"
+   ],
+   "ini": "plugins/stellaris_fleetscan_patch.ini",
+   "fixed": [
+    [
+     "fleetscan",
+     "mode",
+     "off"
+    ],
+    [
+     "fleetscan",
+     "cache",
+     "on"
+    ]
+   ],
+   "settings": [
+    {
+     "section": "fleetscan",
+     "key": "rr",
+     "default": "3",
+     "label": "Как часто обновлять известные флоты",
+     "label_en": "How often to update known fleets",
+     "choices": [
+      [
+       "3",
+       "Раз в 3 дня (рекомендуется)",
+       "Every 3 days (recommended)"
+      ],
+      [
+       "2",
+       "Раз в 2 дня",
+       "Every 2 days"
+      ],
+      [
+       "1",
+       "Каждый день (как в обычной игре)",
+       "Every day (as in the normal game)"
+      ]
+     ],
+     "help": "",
+     "help_en": ""
+    }
+   ],
+   "description": "Точный кэш в задаче «известные флоты страны», и страна обновляет этот список раз в несколько дней, по очереди. Раз в 3 дня — около +2%.\r\n\r\nСведения о чужих флотах запаздывают до 2 дней.\r\n\r\nМеняет ход игры. В режиме «Только точные» не ставится.",
+   "description_en": "An exact cache in the “country's known fleets” task, and a country updates that list once in several days, in turn. Every 3 days gives about +2%.\r\n\r\nInformation about other fleets may be up to 2 days late.\r\n\r\nChanges gameplay. Not installed in “Exact only” mode."
+  },
+  {
+   "id": "lazy",
+   "exact": false,
+   "title": "Редкие дневные расчёты страны",
+   "title_en": "Rare daily country calculations",
+   "files": [
+    "plugins/stellaris_lazy_patch.dll"
+   ],
+   "ini": "plugins/stellaris_lazy_patch.ini",
+   "fixed": [
+    [
+     "lazy",
+     "mode",
+     "on"
+    ],
+    [
+     "lazy",
+     "vis",
+     "3"
+    ],
+    [
+     "lazy",
+     "vispart",
+     "1"
+    ],
+    [
+     "lazy",
+     "sec",
+     "5"
+    ],
+    [
+     "lazy",
+     "int",
+     "3"
+    ],
+    [
+     "lazy",
+     "cb",
+     "3"
+    ]
+   ],
+   "description": "Четыре дневных расчёта страны идут не каждый день, а по очереди: видимость страны раз в 3 дня, оценки систем для секторов раз в 5 дней, уровень разведки между странами и поводы к войне раз в 3 дня. Вместе около +6%.\r\n\r\nАвтоматика секторов реагирует с задержкой до 4 дней, остальное — до 2 дней.\r\n\r\nМеняет ход игры. В режиме «Только точные» не ставится.",
+   "description_en": "Four daily country calculations run in turn instead of every day: country visibility every 3 days, system scores for sectors every 5 days, intel level between countries and casus belli every 3 days. Together about +6%.\r\n\r\nSector automation reacts up to 4 days late, the rest up to 2 days.\r\n\r\nChanges gameplay. Not installed in “Exact only” mode."
+  },
+  {
+   "id": "modflush",
+   "exact": false,
+   "title": "Отложенный пересчёт модификаторов",
+   "title_en": "Deferred modifier recalculation",
+   "files": [
+    "plugins/stellaris_modflush_patch.dll"
+   ],
+   "ini": "plugins/stellaris_modflush_patch.ini",
+   "fixed": [
+    [
+     "modflush",
+     "mode",
+     "on"
+    ],
+    [
+     "modflush",
+     "mask",
+     "961"
+    ]
+   ],
+   "description": "Игра пересчитывает граф модификаторов после многих мелких изменений, около 6000 раз в минуту. Плагин откладывает часть пересчётов до ближайшего планового (дважды в день, в начале месяца и по пакетным изменениям): около 280 раз в минуту, +2%.\r\n\r\nНекоторые модификаторы вступают в силу позже, в пределах дня.\r\n\r\nМеняет ход игры. В режиме «Только точные» не ставится.",
+   "description_en": "The game recalculates the modifier graph after many small changes, about 6000 times a minute. The plugin defers some of them to the next planned one (twice a day, at the start of a month and on batch changes): about 280 times a minute, +2%.\r\n\r\nSome modifiers take effect later, within the day.\r\n\r\nChanges gameplay. Not installed in “Exact only” mode."
+  },
+  {
+   "id": "opday",
+   "exact": false,
+   "title": "Мнение стран раз в день",
+   "title_en": "Country opinions once a day",
+   "files": [
+    "plugins/stellaris_opday_patch.dll"
+   ],
+   "ini": "plugins/stellaris_opday_patch.ini",
+   "fixed": [
+    [
+     "opday",
+     "mode",
+     "on"
+    ]
+   ],
+   "description": "Мнение одной страны о другой считается заново при каждом запросе. Плагин запоминает его на игровой день. Около +2,6%.\r\n\r\nИзменение мнения внутри дня видно со следующего дня.\r\n\r\nМеняет ход игры. В режиме «Только точные» не ставится.",
+   "description_en": "The opinion of one country about another is recalculated on every request. The plugin keeps it for the game day. About +2.6%.\r\n\r\nA change of opinion within a day shows from the next day.\r\n\r\nChanges gameplay. Not installed in “Exact only” mode."
+  },
+  {
+   "id": "cmpc",
+   "exact": false,
+   "title": "Кэш числовых условий в микротике",
+   "title_en": "Numeric condition cache within a micro tick",
+   "files": [
+    "plugins/stellaris_cmpc_patch.dll"
+   ],
+   "ini": "plugins/stellaris_cmpc_patch.ini",
+   "fixed": [
+    [
+     "cmpc",
+     "mode",
+     "on"
+    ]
+   ],
+   "description": "Условия вида «посчитать и сравнить с числом» запоминаются в пределах микротика. Расчёт условий дешевле на 18%.\r\n\r\nЕсли значение изменилось внутри того же микротика, условие увидит его в следующем; на практике это почти не заметно.\r\n\r\nМеняет ход игры. В режиме «Только точные» не ставится.",
+   "description_en": "Conditions like “count and compare with a number” are kept within a micro tick. Condition evaluation is 18% cheaper.\r\n\r\nIf a value changes within the same micro tick, the condition sees it in the next one; in practice this is hardly noticeable.\r\n\r\nChanges gameplay. Not installed in “Exact only” mode."
+  }
+ ]
+}

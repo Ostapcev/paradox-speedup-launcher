@@ -45,7 +45,8 @@
    "process": "stellaris",
    "install_dir": "Stellaris",
    "accent": "#2E5C8A",
-   "status": "planned"
+   "manifest": "stellaris_manifest.json",
+   "status": "available"
   },
   {
    "id": "vic3",

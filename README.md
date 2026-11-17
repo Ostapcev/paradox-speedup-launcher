@@ -10,7 +10,7 @@
 
 - Shows every game from the catalogue. Each game has its own plugin set; a game without plugins yet is marked "coming".
 - Finds each game by itself: in Steam (registry, `libraryfolders.vdf`, `appmanifest_<appid>.acf`) and in GOG (GOG Galaxy and offline installers: the `GOG.com\Games` registry key, the uninstall list, the default folders). The folder can also be chosen by hand; the choice is remembered.
-- Checks the game version by the SHA-256 of the exe (Steam and GOG builds of EU4 1.37.5, Steam builds of HoI4 1.19.4.2 and 1.19.5.0).
+- Checks the game version by the SHA-256 of the exe (Steam and GOG builds of EU4 1.37.5, Steam builds of HoI4 1.19.4.2 and 1.19.5.0, Steam build of Stellaris 4.5.4).
 - Downloads the plugin descriptions and the archive, and verifies the checksums.
 - Three modes: "All plugins", "Exact only", "Custom".
 - Shows a description and the settings of every plugin.
