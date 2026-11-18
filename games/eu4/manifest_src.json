@@ -1,6 +1,6 @@
 {
- "version": "4.5",
- "title": "Ускорение EU4 — версия 4.5",
+ "version": "4.6",
+ "title": "Ускорение EU4 — версия 4.6",
  "game_version": "1.37.5",
  "exe_sha256": [
   "9ad3efe1af169f40ee577f9dae5debbc87af6fb8b5450fb345ebf110dc4d771a",
@@ -92,17 +92,17 @@
      "section": "render",
      "key": "tick_interval",
      "label": "Обновление картинки во время начала месяца",
-     "default": "0.5",
+     "default": "0.1",
      "choices": [
       [
        "0.1",
-       "Часто (плавнее, медленнее)",
-       "Often (smoother, slower)"
+       "Часто (рекомендуется)",
+       "Often (recommended)"
       ],
       [
        "0.5",
-       "Раз в полсекунды (рекомендуется)",
-       "Every half second (recommended)"
+       "Раз в полсекунды (быстрее)",
+       "Every half second (faster)"
       ],
       [
        "2",
@@ -996,5 +996,5 @@
   "label": "Переключить игру в режим «без рамки» (нужно для DXVK)",
   "label_en": "Switch the game to borderless fullscreen (needed for DXVK)"
  },
- "title_en": "EU4 speed-up — version 4.5"
+ "title_en": "EU4 speed-up — version 4.6"
 }
